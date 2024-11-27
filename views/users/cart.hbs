@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart Page</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .cart-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            flex-wrap: wrap;
+        }
+
+        .cart-items {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 750px;
+        }
+
+        .cart-item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            width: 100%;
+            max-width: 48%;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            flex-wrap: wrap;
+        }
+
+        .cart-item img {
+            width: 120px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 15px;
+        }
+
+        .book-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .book-title {
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        .book-author {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .book-price {
+            font-size: 1em;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .quantity-control {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .quantity-control button {
+            background-color: #eee;
+            border: none;
+            width: 30px;
+            height: 30px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .quantity-control input {
+            width: 40px;
+            text-align: center;
+            border: 1px solid #ddd;
+            margin: 0 5px;
+            font-size: 1em;
+        }
+
+        .icon-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .wishlist-btn {
+            color: #d9534f;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .delete-icon {
+            color: #333;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .total-price {
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .checkout-section {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            width: 100%;
+            max-width: 350px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            align-self: flex-start;
+        }
+
+        .checkout-title {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .checkout-summary p {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+
+        .checkout-btn {
+            width: 100%;
+            background-color: #b58684;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .error-box {
+            color: red;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .cart-container {
+                flex-direction: column;
+            }
+
+            .cart-item {
+                max-width: 100%;
+            }
+
+            .checkout-section {
+                width: 100%;
+                margin-top: 20px;
+            }
+
+            .quantity-control button,
+            .quantity-control input {
+                font-size: 0.9em;
+                width: 25px;
+                height: 25px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    {{> user/header}}
+
+    <div class="container">
+ <div class="my-4">
+  <ol class="breadcrumb" style="background-color: transparent; font-size: 0.9rem; font-family: 'Poppins', sans-serif; color: #6c757d;">
+    {{#each breadcrumbs}}
+      {{#if url}}
+        <li class="breadcrumb-item"><a href="{{url}}" style="color: #6c757d; text-decoration: none;">{{name}}</a></li>
+      {{else}}
+        <li class="breadcrumb-item active" aria-current="page" style="color: #6c757d;">{{name}}</li>
+      {{/if}}
+    {{/each}}
+  </ol>
+</div>
+ </div>
+
+    <div class="cart-container">
+        <div class="cart-items">
+            {{#if cartItems.length}}
+            {{#each cartItems}}
+            <div class="cart-item">
+                <img src="/uploads/product-images/{{this.productImage}}" alt="{{this.bookName}}">
+                <div class="book-info">
+                    <div class="book-title">{{this.bookName}}</div>
+                    <div class="book-author">by {{this.authorName}}</div>
+                   
+                   {{#if this.offerName}}
+                    <div class="book-price">Price: RS.
+                   <span class="original-price"
+                        style="text-decoration: line-through; color: #888;">₹{{this.price}}</span>
+                    </div>
+                <p style="font-size: 1.1rem; color: #388e3c;">{{this.discount}}% discount</p>
+                {{/if}}
+                     <div class="book-price">Price: RS.{{this.salePrice}}</div>
+                    <div class="book-stock">Stock: {{this.stock}}</div>
+                    <div class="quantity-control" data-stock="{{this.stock}}" data-id="{{this.id}}">
+                        <button class="decrease-cart-quantity" data-id="{{this.id}}">-</button>
+                        <input id="{{this.id}}-quantity" type="text" value="{{this.quantity}}" readonly>
+                        <button class="increase-cart-quantity" data-id="{{this.id}}">+</button>
+                    </div>
+                    {{#ifEquals this.proceedStatus false}}
+                    <div class="error-box">
+                        <p> Please adjust the quantities or remove items to proceed to checkout.</p>
+                    </div>
+                    {{/ifEquals}}
+
+                    <div class="total-price" id="{{this.id}}-total" data-price="{{this.salePrice}}">
+                        Total Price: RS. {{multiply this.salePrice this.quantity}}
+                    </div>
+                    <div class="icon-container">
+                        <i class="fas fa-heart wishlist-btn" title="Move to wishlist"></i>
+                        <i class="fas fa-trash delete-icon" title="Remove item" onclick="deleteItem('{{this.id}}')"></i>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+            {{else}}
+            <div class="container" style="text-align: center;">
+                <div><img src="https://cdni.iconscout.com/illustration/premium/thumb/empty-cart-illustration-download-in-svg-png-gif-file-formats--shopping-ecommerce-simple-error-state-pack-user-interface-illustrations-6024626.png?f=webp" alt=""></div>
+            <p>Your cart is empty.</p>
+            <a href="/viewmore">Explore collections </a>
+            </div>
+            {{/if}}
+        </div>
+        <div class="checkout-section">
+            <div class="checkout-title">Order Summary</div>
+            <div class="checkout-summary">
+                <p><span>Subtotal:</span> <span id="subtotal">RS. {{subtotal}}</span></p>
+                <p><span>Shipping:</span> <span>free</span></p>
+                <p><span>Total:</span> <span id="total-price">RS. {{ subtotal }}</span></p>
+            </div>
+            {{#if cartItems.length}}
+            <button class="checkout-btn" onclick="return confirmProceed({{checkout}})">Proceed to Checkout</button>
+            {{/if}}
+        </div>
+    </div>
+    {{> user/footer}}
+
+
+    <script>
+
+        function confirmProceed(status) {
+            console.log(status)
+            if (status == false) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: `Unable to proceed to checkout
+                    Recheck your cart items`,
+                    showConfirmButton: true
+                });
+            } else {
+                window.location.href = "/checkout";
+                return true;
+            }
+        }
+    </script>
+
+
+    <script>
+        async function increaseQuantity(itemId) {
+            const quantityInput = document.getElementById(`${itemId}-quantity`);
+            const quantity = quantityInput.value;
+
+            const quantityControl = document.querySelector(`.quantity-control[data-id="${itemId}"]`);
+            const stock = parseInt(quantityControl.getAttribute('data-stock'));
+
+            if (quantity >= stock || quantity >= 5) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: `Sorry, can't add more of this item. You've reached the maximum quantity allowed or our current stock limit.`,
+                    showConfirmButton: true
+                });
+                return; // Exit the function early to prevent further processing
+            }
+
+
+            try {
+                const response = await fetch(`/cart/increase-quantity/${itemId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to increase quantity');
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Update quantity and total price on the frontend
+                    quantityInput.value = result.item.quantity;
+
+                    const pricePerItem = parseFloat(document.getElementById(`${itemId}-total`).getAttribute('data-price'));
+                    const totalPriceElement = document.getElementById(`${itemId}-total`);
+                    const itemTotal = pricePerItem * result.item.quantity;
+                    totalPriceElement.textContent = `Total Price: RS. ${itemTotal.toFixed(2)}`;
+
+                    // Update subtotal
+                    updateSubtotal();
+                } else {
+                    alert(result.message || 'Unable to increase quantity');
+                }
+            } catch (error) {
+                console.error('Error increasing quantity:', error);
+                alert('An error occurred while increasing the quantity. Please try again.');
+            }
+        }
+
+        async function decreaseQuantity(itemId) {
+            const quantityInput = document.getElementById(`${itemId}-quantity`);
+
+            try {
+                const response = await fetch(`/cart/decrease-quantity/${itemId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to decrease quantity');
+                }
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Update quantity and total price on the frontend
+                    quantityInput.value = result.item.quantity;
+
+                    const pricePerItem = parseFloat(document.getElementById(`${itemId}-total`).getAttribute('data-price'));
+                    const totalPriceElement = document.getElementById(`${itemId}-total`);
+                    const itemTotal = pricePerItem * result.item.quantity;
+                    totalPriceElement.textContent = `Total Price: RS. ${itemTotal.toFixed(2)}`;
+
+                    updateSubtotal();
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: result.message || 'Unable to decrease the quauanity',
+                    });
+                }
+            } catch (error) {
+                console.error('Error decreasing quantity:', error);
+                alert('An error occurred while decreasing the quantity. Please try again.');
+            }
+        }
+
+        async function deleteItem(itemId) {
+            try {
+                const confirmation = await Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you want to remove this item from your cart?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'Cancel'
+                });
+
+                if (!confirmation.isConfirmed) {
+                    return; 
+                }
+                const response = await fetch(`/cart/delete-item/${itemId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to delete item');
+                }
+                const result = await response.json();
+                if (result.success) {
+                    const cartItemElement = document.querySelector(`.cart-item .delete-icon[onclick="deleteItem('${itemId}')"]`).closest('.cart-item');
+                    if (cartItemElement) {
+                        cartItemElement.remove();
+
+                        updateSubtotal();
+                    } else {
+                        console.error('Cart item element not found for ID:', itemId);
+                    }
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted!',
+                        text: 'Item has been removed from your cart.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                     location.reload(); 
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: result.message || 'Unable to delete item',
+                    });
+                }
+            } catch (error) {
+                console.error('Error deleting item:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'An error occurred while deleting the item. Please try again.',
+                });
+            }
+        }
+
+        function updateSubtotal() {
+            const subtotalElements = document.querySelectorAll('[id$="-total"]');
+            let subtotal = 0;
+
+            subtotalElements.forEach(element => {
+                const priceText = element.textContent.replace('Total Price: RS. ', '');
+                subtotal += parseFloat(priceText);
+            });
+
+            document.getElementById('subtotal').textContent = `RS. ${subtotal.toFixed(2)}`;
+            const totalPrice = subtotal + 0; // Add shipping cost (now it is free ,you can add if you want )
+            document.getElementById('total-price').textContent = `RS. ${totalPrice.toFixed(2)}`;
+        }
+
+        // Event listeners for increase and decrease buttons
+        document.querySelectorAll('.increase-cart-quantity').forEach(button => {
+            button.addEventListener('click', function () {
+                const itemId = this.getAttribute('data-id');
+                increaseQuantity(itemId);
+            });
+        });
+
+        document.querySelectorAll('.decrease-cart-quantity').forEach(button => {
+            button.addEventListener('click', function () {
+                const itemId = this.getAttribute('data-id');
+                decreaseQuantity(itemId);
+            });
+        });
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+
+</html>

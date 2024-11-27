@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Edit your saved address">
+    <meta name="keywords" content="edit, address, form, address update">
+    <meta name="author" content="Your Name or Company Name">
+    <title>Edit Address</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+
+        .card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 600px;
+            margin: auto;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin: 10px 0 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .error-box {
+            color: red;
+            font-size: 12px;
+        }
+
+        .place-order-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #a72828;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .place-order-btn:hover {
+            background-color: #f9104653;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="card billing-form">
+        <h2>Edit Address</h2>
+        <form action="/editaddress/{{address._id}}" method="post" onsubmit="return validateAddressForm()">
+            <input type="hidden" name="addressId" value="{{address._id}}">
+
+            <label for="name">Name</label>
+            <input type="text" id="name" placeholder="Name" name="name" value="{{address.name}}">
+            <span id="name-error" class="error-box"></span>
+
+            <label for="houseName">Company or House Name</label>
+            <input type="text" id="houseName" placeholder="Company or House Name" name="houseName"
+                value="{{address.houseName}}">
+            <span id="houseName-error" class="error-box"></span>
+
+            <label for="city">Town or City</label>
+            <input type="text" id="city" placeholder="Street No or Name" name="city" value="{{address.city}}">
+            <span id="city-error" class="error-box"></span>
+
+            <label for="landmark">Landmark</label>
+            <input type="text" id="landMark" placeholder="Landmark" name="landMark" value="{{address.landMark}}">
+            <span id="landmark-error" class="error-box"></span>
+
+            <label for="state">State</label>
+            <input type="text" id="state" placeholder="State" name="state" value="{{address.state}}">
+            <span id="state-error" class="error-box"></span>
+
+            <label for="pincode">Pincode</label>
+            <input type="text" id="pincode" placeholder="Pincode" name="pincode" value="{{address.pincode}}">
+            <span id="pincode-error" class="error-box"></span>
+
+            <label for="phone">Phone</label>
+            <input type="tel" id="phone" placeholder="Phone" name="phone" value="{{address.phone}}">
+            <span id="phone-error" class="error-box"></span>
+
+            <label for="altPhone">Alt Phone</label>
+            <input type="tel" id="altPhone" placeholder="Alternative Phone Number" name="altPhone"
+                value="{{address.altPhone}}">
+            <span id="altPhone-error" class="error-box"></span>
+
+            <button class="place-order-btn">Save Changes</button>
+        </form>
+    </div>
+
+
+    <script>
+        function validateAddressForm() {
+            let isValid = true;
+
+
+            const name = document.getElementById('name').value;
+            if (!name) {
+                document.getElementById('name-error').textContent = "Name is required";
+                isValid = false;
+            } else {
+                document.getElementById('name-error').textContent = "";
+            }
+
+            // Check phone number field
+            const phone = document.getElementById('phone').value;
+            if (!phone) {
+                document.getElementById('phone-error').textContent = "Phone number is required";
+                isValid = false;
+            } else {
+                document.getElementById('phone-error').textContent = "";
+            }
+
+
+            return isValid;
+        }
+    </script>
+</body>
+
+</html>

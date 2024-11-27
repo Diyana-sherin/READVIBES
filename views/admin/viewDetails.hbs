@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+      {{> admin/header}}
+
+
+      <!-- order-history.hbs -->
+<h6> Orders Deatails</h6>
+ <div class="main-content mt-5">
+<div class="card mb-4">
+    <div class="card-body">
+        <h6>Order ID: {{order.id}} <span class="text-success">{{order.status}}</span></h6>
+        <p>Date: </p>
+       
+        <hr>
+        <div class="row">
+            <div class="col-md-4">
+                <p><strong>Contact</strong></p>
+                <p>{{order.userName}}<br>
+                    Phone: {{order.userPhone}}<br>
+                    Email: {{order.userEmail}}</p>
+            </div>
+            <div class="col-md-4">
+                <p><strong>Shipping Address</strong></p>
+                <p>{{order.userAddress}}</p>
+            </div>
+            <div class="col-md-4">
+                <p><strong>Payment</strong></p>
+                <p>{{order.paymentMethod}}<br>
+                    Coupon Discount :{{order.couponDiscount}} <br>
+                    Shipping fee: Free<br>
+                    Total paid: Rs{{order.finalAmount}}</p>
+            </div>
+        </div>
+        <hr>
+        <div class="d-flex">
+            {{#each order.items as |item|}}
+            <div class="mr-3">
+                <h5>{{item.bookName}}</h5>
+                <p>
+                    <img src="/uploads/product-images/{{item.productImage}}" alt="Item Image" width="50" height="50"> {{this.name}}<br>
+                   <p>Quantity: {{item.quantity}}</p>
+                    <p>Price: Rs {{item.price}}</p>
+                     <p>offerDiscount:  {{item.offerDiscount}}%</p>
+                      <p>OfferPrice: Rs {{item.offerPrice}}</p>
+                </p>
+            </div>
+           {{/each}}
+        </div>
+    </div>
+</div>
+ </div>
+
+
+
+        {{> admin/footer}}
+</body>
+</html>

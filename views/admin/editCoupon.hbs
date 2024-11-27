@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit Coupon</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <style>
+    .error-msg {
+      color: red;
+      font-size: 0.9em;
+    }
+    .container {
+      margin-top: 50px;
+      max-width: 600px;
+      background-color: #e9ecef;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+  </style>
+</head>
+<body>
+
+    {{> admin/header}}
+
+<div class="main-content mt-5">
+  <div class="container mt-5">
+    <h2>Edit Coupon</h2>
+    {{#if message}}
+      <div class="alert alert-danger" role="alert">
+        {{message}}
+      </div>
+    {{/if}}
+    <form id="couponForm" action="/admin/editCoupon/{{coupon._id}}" method="POST" onsubmit="return validateForm()">
+      <div class="form-group">
+        <label for="couponCode">Coupon Code</label>
+        <input type="text" class="form-control" id="couponCode" name="couponCode" value="{{coupon.couponCode}}" placeholder="Enter coupon code" >
+        <span id="couponCodeError" class="error-msg"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="discount">Discount (%)</label>
+        <input type="number" class="form-control" id="discount" name="discount" value="{{coupon.discount}}" placeholder="Enter discount percentage (1-100)" min="1" max="100">
+        <span id="discountError" class="error-msg"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="minimumPurchase">Minimum Purchase Amount</label>
+        <input type="number" class="form-control" id="minimumPurchase" name="minimumPurchase" value="{{coupon.minimumPurchase}}" placeholder="Enter minimum purchase amount" min="1">
+        <span id="minimumPurchaseError" class="error-msg"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="usagePerUser">Usage Per User</label>
+        <input type="number" class="form-control" id="usagePerUser" name="usagePerUser" value="{{coupon.usagePerUser}}" placeholder="Enter usage per user" min="1">
+        <span id="usagePerUserError" class="error-msg"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="maxTotalUsers">Max Total Users</label>
+        <input type="number" class="form-control" id="maxTotalUsers" name="maxTotalUsers" value="{{coupon.maxTotalUsers}}" placeholder="Enter max total users" min="1">
+        <span id="maxTotalUsersError" class="error-msg"></span>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Update Coupon</button>
+    </form>
+  </div>
+</div>
+
+{{> admin/footer}}
+
+<script>
+  function validateForm() {
+    let isValid = true;
+
+    // Clear previous error messages
+    document.getElementById("couponCodeError").textContent = "";
+    document.getElementById("discountError").textContent = "";
+    document.getElementById("minimumPurchaseError").textContent = "";
+    document.getElementById("usagePerUserError").textContent = "";
+    document.getElementById("maxTotalUsersError").textContent = "";
+
+    const couponCode = document.getElementById("couponCode").value.trim();
+    const discount = document.getElementById("discount").value;
+    const minimumPurchase = document.getElementById("minimumPurchase").value;
+    const usagePerUser = document.getElementById("usagePerUser").value;
+    const maxTotalUsers = document.getElementById("maxTotalUsers").value;
+
+    
+    if (!couponCode) {
+      document.getElementById("couponCodeError").textContent = "Coupon code is required.";
+      isValid = false;
+    }
+
+
+    if (discount < 1 || discount > 100) {
+      document.getElementById("discountError").textContent = "Discount must be between 1 and 100.";
+      isValid = false;
+    }
+
+
+    if (minimumPurchase < 1) {
+      document.getElementById("minimumPurchaseError").textContent = "Minimum purchase amount must be at least 1.";
+      isValid = false;
+    }
+
+    
+    if (usagePerUser < 1) {
+      document.getElementById("usagePerUserError").textContent = "Usage per user must be at least 1.";
+      isValid = false;
+    }
+
+
+    if (maxTotalUsers < 1) {
+      document.getElementById("maxTotalUsersError").textContent = "Max total users must be at least 1.";
+      isValid = false;
+    }
+
+    return isValid;
+  }
+</script>
+
+</body>
+</html>

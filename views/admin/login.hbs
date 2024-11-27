@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .login-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+            
+        }
+        .login-btn {
+            background-color: #BA8E8E;
+            color: rgb(0, 0, 0);
+            border: none;
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .login-btn:hover {
+            background-color: #BA8E8E;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .password-wrapper{
+            position: relative;
+        }
+        .password-icon{
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            cursor: pointer;
+        }
+        .error-box {
+            color: red;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h3 class="text-center mb-4">Admin Login</h3>
+        <form action="/admin/login" method="post" id="form" onsubmit="return formvalidate()">
+        {{#if message}}
+                <div class="alert alert-danger" role="alert">
+                    {{message}}
+                </div>
+                {{/if}}
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="" class="form-control" id="email" placeholder="Enter email" name="email">
+                <div id="emailError" class="error-box"></div>
+            </div>
+            <div class="form-group">
+                <label for="password">Password:</label>
+                <div class="password-wrapper">
+                <input type="password" class="form-control password-input" id="password" placeholder="Enter password" name="password">
+                <i id="togglepassword" class="fa fa-eye password-icon"></i>   
+                <div id="passwordError" class="error-box"></div> 
+            </div>
+            </div>
+            <div class="form-group">
+                <button type="submit" class="login-btn">Login</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        const togglepassword = document.querySelector('#togglepassword')
+        const password = document.querySelector('#password');
+
+        togglepassword.addEventListener('click',function(e){
+            const type = password.getAttribute('type')==='password' ? 'text' : 'password' ;
+            password.setAttribute('type',type);
+
+            this.classList.toggle('fa-eye-slash');
+            });
+
+
+            function formvalidate() {
+            // get the 
+            var email = document.getElementById('email').value;
+            var password = document.getElementById('password').value;
+
+            // declare error div
+            const emailError = document.getElementById('emailError');
+            const passwordError = document.getElementById('passwordError');
+
+            // Reset error messages
+            emailError.textContent = '';
+            passwordError.textContent = '';
+
+            // Validations 
+            if (email === "") {
+                emailError.textContent = "Email is required";
+                return false;
+            }
+            else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                emailError.textContent = "Please enter a valid email address.";
+                return false;
+            }
+
+            if (password === "") {
+                passwordError.textContent = "Password is required";
+                return false;
+            }
+
+            // Return whether the form is valid (true or false)
+            return true;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+ 
+  <style>
+    #link {
+      font-size: 20px;
+    }
+
+
+    #head {
+      background-color: #d4a3a3;
+      color: black;
+    }
+
+    .header {
+      background-color: #d4a3a3;
+    }
+
+    a {
+      color: black;
+    }
+
+    ::placeholder {
+      font-family: initial;
+    }
+
+    .search {
+      font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+
+    }
+      #link {
+      font-size: 20px;
+    }
+
+
+    #head {
+      background-color: #d4a3a3;
+      color: black;
+    }
+
+    .header {
+      background-color: #d4a3a3;
+    }
+
+
+.background-container {
+  position: relative;
+  background: url('https://hrzone.com/app/uploads/2023/06/key_hr_lessons_from_lego_and_pixar-1024x544.jpg') no-repeat center center;
+  background-size: cover;
+  height: 400px; /* Adjust as needed */
+  display: flex;
+  align-items: center;
+  justify-content: flex-start; /* Align items to the left */
+  padding-left: 20px; /* Add padding for spacing */
+}
+
+.text-overlay {
+  text-align: left; /* Align text to the left */
+  color: white;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+  max-width: 400px; /* Set a max width to control the text area */
+}
+
+    @media (min-width: 768px) {
+      .row2 {
+        flex-direction: row-reverse;
+      }
+    }
+
+    .sb-button--default.sb-button--houseGreen {
+      color: hsl(0, 0%, 0%);
+    }
+
+    .sb-button {
+      display: inline-block;
+      background-color: #b47a7a;
+      border-style: solid;
+      border-width: 1px;
+      border-radius: 15px;
+      padding: 7px 16px;
+      font-weight: 600;
+      line-height: 1.2;
+      text-align: center;
+      -webkit-text-decoration: none;
+      text-decoration: none;
+      transition: all .2s ease;
+    }
+
+    .footer {
+      background-color: #f8f9fa;
+      padding: 20px 0;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .footer-columns {
+      display: flex;
+      justify-content: space-around;
+      text-align: left;
+      padding-bottom: 20px;
+    }
+
+    .footer-columns div {
+      flex: 1;
+      margin: 0 15px;
+    }
+
+    .footer-columns h5 {
+      font-weight: bold;
+      color: #000000;
+      margin-bottom: 10px;
+    }
+
+    .footer-columns a {
+      color: #333;
+      text-decoration: none;
+      display: block;
+      margin: 5px 0;
+    }
+
+    .footer-columns a:hover {
+      text-decoration: underline;
+    }
+
+    .social-icons {
+      margin: 15px 0;
+    }
+
+    .social-icons a {
+      margin: 0 10px;
+      color: #333;
+      font-size: 20px;
+      text-decoration: none;
+    }
+
+    .social-icons a:hover {
+      color: #000000;
+    }
+
+    .copyright {
+      font-size: 12px;
+      color: #666;
+    }
+
+    #link a:hover {
+      color: #4a4848;
+    }
+
+    #head a:hover {
+      color: #4a4848;
+    }
+
+    .logo {
+      font-weight: 700;
+    }
+
+    .container-fluid {
+      background-color: #f8f9fa;
+      padding: 20px;
+    }
+
+    .grey-theme-card {
+      background-color: #e0e0e0;
+      border: none;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .author-name {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+
+    .price-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 5px;
+    }
+
+    .original-price {
+      text-decoration: line-through;
+      color: #888;
+    }
+
+    .sales-price {
+      font-weight: bold;
+      color: #d9534f;
+    }
+
+    .rating {
+      color: #f0ad4e;
+      font-size: 1rem;
+      margin-top: 5px;
+    }
+
+    .icon-section i {
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #555;
+    }
+
+    .icon-section i:hover {
+      color: #333;
+    }
+
+    .view-more-btn {
+      font-weight: bold;
+      color: #000000;
+      border-color: #bc6666;
+      border-radius: 1.5rem;
+    }
+
+    .view-more-btn:hover {
+      background-color: #b37575;
+      color: #000000;
+    }
+    .feature-section {
+      background-color: #f8f9fa;
+      padding: 40px ;
+      margin-bottom: 30px;
+    }
+    .feature-item {
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+    .feature-item:hover {
+      transform: translateY(-10px);
+    }
+    .feature-item .icon-circle {
+      background-color: #333;
+      color: #fff;
+      border-radius: 50%;
+      padding: 10px;
+      margin: 0 auto 15px auto; /* Center align */
+      font-size: 1.5rem;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .feature-item .icon-circle:hover {
+      background-color: #6d7072;
+      color: #fff;
+    }
+    .feature-item h5 {
+      font-weight: bold;
+      margin-bottom: 5px;
+      font-size: 1.1rem;
+    }
+    .feature-item p {
+      color: #777;
+      font-size: 0.9rem;
+    }
+
+  </style>
+</head>
+
+<body>
+  {{> user/header}}
+  <div class="container">
+ <div class="container">
+ <div class="my-4">
+  <ol class="breadcrumb" style="background-color: transparent; font-size: 0.9rem; font-family: 'Poppins', sans-serif; color: #6c757d;">
+    {{#each breadcrumbs}}
+      {{#if url}}
+        <li class="breadcrumb-item"><a href="{{url}}" style="color: #6c757d; text-decoration: none;">{{name}}</a></li>
+      {{else}}
+        <li class="breadcrumb-item active" aria-current="page" style="color: #6c757d;">{{name}}</li>
+      {{/if}}
+    {{/each}}
+  </ol>
+</div>
+ </div>
+  </div>
+  <section class="section p-5">
+  <div class="container background-container">
+    <div class="text-overlay">
+      <h2 class="h2text" style="font-weight: 700; font-size: 55px;">
+        <span>"Feel the story, Live the vibe"</span>
+      </h2>
+      <div class="sm text1" style="font-weight: 500; font-size: 25px;">
+        Discover your next great read,
+      </div>
+      <a href="#explore" class="sb-button sb-button--default sb-button--houseGreen mt-3"
+        style="min-width: 35px; min-height: 35px;">Explore now</a>
+    </div>
+  </div>
+</section>
+
+ 
+
+
+
+
+
+
+  <div class="container my-4" id="explore">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2>New Arravels</h2>
+      <a href="/viewmore" class="btn " style=" font-weight: bold;
+  color: #000000; background-color: #d4a3a3;border-radius: 1.5rem;">View More</a>
+    </div>
+
+    <div class="row">
+      {{#each Newbooks}}
+      <div class="col-md-3 col-sm-6 mb-4"> <!-- Adjusted to col-md-3 for 4 cards per row -->
+        <div class="card grey-theme-card">
+          <a href="/bookDetails/{{this._id}}">
+            <img src="/uploads/product-images/{{this.productImage.[0]}}" alt="{{this.bookName}}" class="card-img-top"
+              style="height: 200px; object-fit: cover;">
+          </a>
+          <div class="card-body">
+            <h5 class="card-title">{{this.bookName}}</h5>
+            <p class="card-text author-name">by {{this.authorName}}</p>
+            <div class="price-section">
+              {{#if this.offerName}}
+               <div>
+              <span class="original-price">₹{{this.salePrice}}</span>
+              
+              <span class="sales-price" style=" color: #388e3c;">₹{{this.offerPrice}}</span>
+               </div>
+                <span  style=" color: #388e3c;" >{{this.discount}}% off </span>
+              {{else}}
+              
+              <span class="sales-price">₹{{this.salePrice}}</span>
+              {{/if}}
+             
+            </div>
+            <div class="rating">
+              <span>⭐⭐⭐⭐⭐</span> <!-- Dummy content for rating -->
+            </div>
+            <div class="icon-section d-flex justify-content-between mt-3">
+              <a href="#" data-id="{{this._id}}" class="add-to-wishlist"><i class="fa fa-heart wishlist-icon"></i></a>
+              <a href="#" data-id="{{this._id}}" class="add-to-cart"><i class="fa fa-shopping-cart cart-icon"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+
+<div class="container my-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h2>Our Collections</h2>
+      <a href="/viewmore" class="btn " style=" font-weight: bold;
+  color: #000000; background-color: #d4a3a3;border-radius: 1.5rem;">View More</a>
+    </div>
+
+    <div class="row">
+      {{#each books}}
+      <div class="col-md-3 col-sm-6 mb-4"> <!-- Adjusted to col-md-3 for 4 cards per row -->
+        <div class="card grey-theme-card">
+          <a href="/bookDetails/{{this._id}}">
+            <img src="/uploads/product-images/{{this.productImage.[0]}}" alt="{{this.bookName}}" class="card-img-top"
+              style="height: 200px; object-fit: cover;">
+          </a>
+          <div class="card-body">
+            <h5 class="card-title">{{this.bookName}}</h5>
+            <p class="card-text author-name">by {{this.authorName}}</p>
+            <div class="price-section">
+               {{#if this.offerName}}
+               <div>
+              <span class="original-price">₹{{this.salePrice}}</span>
+              
+              <span class="sales-price" style=" color: #388e3c;">₹{{this.offerPrice}}</span>
+               </div>
+                <span  style=" color: #388e3c;" >{{this.discount}}% off </span>
+              {{else}}
+              
+              <span class="sales-price">₹{{this.salePrice}}</span>
+              {{/if}}
+             
+            </div>
+            <div class="rating">
+              <span>⭐⭐⭐⭐⭐</span> <!-- Dummy content for rating -->
+            </div>
+            <div class="icon-section d-flex justify-content-between mt-3">
+              <a href="#" data-id="{{this._id}}" class="add-to-wishlist"><i class="fa fa-heart wishlist-icon"></i></a>
+              <a href="#" data-id="{{this._id}}" class="add-to-cart"><i class="fa fa-shopping-cart cart-icon"></i></a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/each}}
+    </div>
+  </div>
+
+
+  <div class="container feature-section">
+  <div class="row">
+    <!-- Free Delivery -->
+    <div class="col-md-4 feature-item">
+      <div class="icon-circle">
+        <i class="fas fa-shipping-fast"></i>
+      </div>
+      <h5>FREE AND FAST DELIVERY</h5>
+      <p>Free delivery</p>
+    </div>
+    <!-- Customer Service -->
+    <div class="col-md-4 feature-item">
+      <div class="icon-circle">
+        <i class="fas fa-headset"></i>
+      </div>
+      <h5>24/7 CUSTOMER SERVICE</h5>
+      <p>Friendly 24/7 customer support</p>
+    </div>
+    <!-- Money Back Guarantee -->
+    <div class="col-md-4 feature-item">
+      <div class="icon-circle">
+        <i class="fas fa-shield-alt"></i>
+      </div>
+      <h5>MONEY BACK GUARANTEE</h5>
+      <p>We return money within 30 days</p>
+    </div>
+  </div>
+</div>
+
+
+  {{> user/footer}}
+
+  <!--Actions-->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <script>
+    document.querySelectorAll(".add-to-cart").forEach(item => {
+      item.addEventListener('click', function(event) {
+        event.preventDefault();
+        const bookId = this.getAttribute('data-id');
+        fetch(`/addToCart/${bookId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(res => res.json())
+        .then(data => {
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: data.message,
+            showConfirmButton: false,
+            timer: 1500,
+            timerProgressBar: true,
+          });
+        })
+        .catch(error => {
+          console.log("Error:", error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong! Please try again later.',
+          });
+        });
+      });
+    });
+
+      document.querySelectorAll(".add-to-wishlist").forEach(item => {
+      item.addEventListener('click', function(event) {
+        event.preventDefault();
+        const bookId = this.getAttribute('data-id');
+        fetch(`/addWishlist/${bookId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+        .then(res => res.json())
+        .then(data => {
+          Swal.fire({
+            toast: true,
+            position: 'top-end',
+            icon: 'success',
+            title: data.message,
+            showConfirmButton: false,
+            timer: 1500,
+            timerProgressBar: true,
+          });
+        })
+        .catch(error => {
+          console.log("Error:", error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'Something went wrong! Please try again later.',
+          });
+        });
+      });
+    });
+  </script>
+
+<script>
+  document.getElementById('div2').addEventListener('click', function () {
+    // Retrieve the category value
+    const category = document.getElementById('input2').value;
+    console.log(category); // Log the category for debugging
+
+    // Make the POST request
+    fetch('/filterBooks', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ category: category }), // Send the correct category
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          
+        } else {
+          console.error('Failed to filter books');
+        }
+      })
+      .catch(err => console.error('Error:', err));
+  });
+</script>
+
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+
+</body>
+
+</html>

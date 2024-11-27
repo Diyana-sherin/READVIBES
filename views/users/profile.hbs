@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Details</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+</head>
+<style>
+    .address-card {
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+    }
+</style>
+
+<body>
+    {{> user/header}}
+    <div class="container-fluid p-5">
+        <div class="row">
+            <!-- Sidebar Section -->
+            <div class="col-md-3">
+                <div class="list-group">
+                    <a href="/profile" class="list-group-item list-group-item-action">Profile</a>
+                    <a href="/wallet" class="list-group-item list-group-item-action">Wallet</a>
+                    <a href="/myorders" class="list-group-item list-group-item-action">My orders</a>
+                    <a href="/availableCoupons" class="list-group-item list-group-item-action">coupons</a>
+                </div>
+            </div>
+
+            <div class="col-md-9 p-5">
+                <!-- Profile Information -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <img src="https://via.placeholder.com/60" alt="User Avatar">
+                        <div class="user-info">
+                            <h2>{{user.name}}</h2>
+                            <p>Email: {{user.email}}</p>
+                            <p>Phone: {{user.phone}}</p>
+                        </div>
+                        <i class="fas fa-edit edit-icon" title="Edit Profile" onclick="confirmEditProfile()"></i>
+
+                    </div>
+                </div>
+
+                <!-- Address Section -->
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h6>Addresses</h6>
+                        {{#if addresses.length}}
+                        {{#each addresses}}
+                        <div class="address-card" id="address-{{this.id}}">
+                            <div class="address-details">
+                                <p><strong>{{this.name}}</strong></p>
+                                <p>{{this.houseName}}, {{this.city}}</p>
+                                <p>{{this.landMark}}, {{this.state}}</p>
+                                <p>Pin: {{this.pincode}}</p>
+                                <p>Ph: {{this.phone}}, Alt: {{this.altPhone}}</p>
+                            </div>
+                            <div class="address-actions">
+                                <i class="fa fa-edit edit-address" title="Edit Address" data-id="{{this.id}}" onclick="confirmEditAddress('{{this.id}}')"></i>
+                                <i class="fa fa-trash delete-icon" title="Remove Address"
+                                    onclick="deleteAddress('{{this.id}}')"></i>
+                            </div>
+                        </div>
+                        {{/each}}
+                        {{else}}
+                        <p>No saved addresses.</p>
+                        {{/if}}
+                        <a href="/profile/addAddress"><button class="btn btn-outline-primary mt-2">+ Add New Address</button></a>
+                    </div>
+                </div>
+
+             
+            </div>
+        </div>
+    </div>
+
+
+    {{> user/footer}}
+
+
+   <script>
+    async function deleteAddress(addressId) {
+        try {
+            const confirmation = await Swal.fire({
+                title: 'Are you sure?',
+                text: "Do you want to remove this address from your list?",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            });
+
+            if (!confirmation.isConfirmed) {
+                return;
+            }
+
+            const response = await fetch(`/address/delete/${addressId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete address');
+            }
+
+            const result = await response.json();
+            if (result.success) {
+                const addressElement = document.getElementById(`address-${addressId}`);
+                if (addressElement) {
+                    addressElement.remove();
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted!',
+                        text: 'Address has been removed successfully.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } else {
+                    console.error('Address element not found for ID:', addressId);
+                }
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: result.message || 'Unable to delete address',
+                });
+            }
+        } catch (error) {
+            console.error('Error deleting address:', error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: 'An error occurred while deleting the address. Please try again.',
+            });
+        }
+    }
+async function confirmEditAddress(addressId) {
+    try {
+        const confirmation = await Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to edit this address?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, edit it!',
+            cancelButtonText: 'Cancel'
+        });
+
+        if (confirmation.isConfirmed) {
+            window.location.href = `/editAddress/${addressId}`;
+        }
+    } catch (error) {
+        console.error('Error during edit confirmation:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'An error occurred while trying to edit the address. Please try again.',
+        });
+    }
+}
+
+async function confirmEditProfile() {
+    try {
+        const confirmation = await Swal.fire({
+            title: 'Are you sure?',
+            text: "Do you want to edit this profile?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, edit it!',
+            cancelButtonText: 'Cancel'
+        });
+
+        if (confirmation.isConfirmed) {
+            window.location.href = `/editprofile`;
+        }
+    } catch (error) {
+        console.error('Error during profile edit confirmation:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Oops...',
+            text: 'An error occurred while trying to edit the profile. Please try again.',
+        });
+    }
+}
+
+</script>
+
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
+        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</body>
+
+</html>

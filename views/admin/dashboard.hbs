@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard - Online Bookstore</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+    integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Add Font Awesome for icons -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity="sha384-KyZXEAg3QhqLMpG8r+Knujsl5/6hb5gG3B3b7bZx04Pqt7AI0oLIbKZRulD63t+4"
+    crossorigin="anonymous"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+    integrity="sha384-pzjw8f+ua7Kw1TIqg6BpDIoy7whejaW2Gz7Pjw5RrIMhxP1f4QmQY/zZ8bFwJpIOG"
+    crossorigin="anonymous"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+
+
+  <style>
+    /* Custom Styles */
+    .sidebar {
+      min-width: 250px;
+      background-color: #D3ACAC;
+      min-height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+
+    .sidebar .nav-link {
+      color: #000000;
+    }
+
+    .sidebar .nav-link:hover {
+      background-color: #BA8E8E;
+    }
+
+    .main-content {
+      margin-left: 250px;
+      padding: 20px;
+      z-index: 1;
+    }
+
+    .header {
+      background-color: #df9c9c;
+      color: #000000;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 250px;
+      right: 0;
+
+
+     z-index: 1000;
+    }
+
+    .footer {
+      background-color: #f8f9fa;
+      padding: 10px;
+      text-align: center;
+    }
+
+    .link a {
+      color: #000000;
+    }
+
+    .link a:hover {
+      color: #4a4848;
+    }
+
+    footer {
+      background-color: #f8f9fa;
+      padding: 20px 0;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .footer-columns {
+      display: flex;
+      justify-content: space-around;
+      text-align: left;
+      padding-bottom: 20px;
+    }
+
+    .footer-columns div {
+      flex: 1;
+      margin: 0 15px;
+    }
+
+    .footer-columns h5 {
+      font-weight: bold;
+      color: #000000;
+      margin-bottom: 10px;
+    }
+
+    .footer-columns a {
+      color: #333;
+      text-decoration: none;
+      display: block;
+      margin: 5px 0;
+    }
+
+    .footer-columns a:hover {
+      text-decoration: underline;
+    }
+
+    .social-icons {
+      margin: 15px 0;
+    }
+
+    .social-icons a {
+      margin: 0 10px;
+      color: #333;
+      font-size: 20px;
+      text-decoration: none;
+    }
+
+    .social-icons a:hover {
+      color: #000000;
+    }
+
+    .copyright {
+      font-size: 12px;
+      color: #666;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f6f9;
+      padding: 20px;
+    }
+
+    .card {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .card .icon {
+      font-size: 40px;
+      margin-bottom: 15px;
+    }
+
+    .card .title {
+      font-size: 16px;
+      color: #888;
+      margin-bottom: 10px;
+    }
+
+    .card .value {
+      font-size: 24px;
+      font-weight: bold;
+    }
+
+    .card.blue {
+      border-left: 5px solid #4a90e2;
+    }
+
+    .card.red {
+      border-left: 5px solid #e94e77;
+    }
+
+    .card.green {
+      border-left: 5px solid #8cc152;
+    }
+
+
+    .sales-report {
+      padding: 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    table,
+    th,
+    td {
+      border: 1px solid #ddd;
+    }
+
+    th,
+    td {
+      padding: 10px;
+      text-align: left;
+    }
+
+    .filters button {
+      margin-right: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  {{> admin/header}}
+  
+  <br>
+  <br>
+
+  <div class="main-content mt-5">
+    <h3>Overview</h3>
+
+    <div class="container">
+      <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-4">
+
+        <!-- Total Users Card -->
+        <div class="col">
+          <div class="card blue">
+            <div class="icon"><i class="fas fa-users"></i></div>
+            <div class="title">Total Users</div>
+            <div class="value" id="totalUsers">{{totalUsers}}</div>
+          </div>
+        </div>
+
+        <!-- Total Revenue Card -->
+        <div class="col">
+          <div class="card red">
+            <div class="icon"><i class="fas fa-rupee-sign"></i></div>
+            <div class="title">Total Revenue</div>
+            <div class="value" id="totalRevenue">{{totalRevenue}}</div>
+          </div>
+        </div>
+
+        <!-- Total Orders Card -->
+        <div class="col">
+          <div class="card green">
+            <div class="icon"><i class="fas fa-box"></i></div>
+            <div class="title">Total Orders</div>
+            <div class="value" id="totalOrders">{{totalOrders}}</div>
+          </div>
+        </div>
+
+      </div>
+
+
+      <h1 class="text-center">Sales Report</h1>
+      <form id="reportForm" class="mb-4">
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="reportType" id="daily" value="daily" checked>
+          <label class="form-check-label" for="daily">Daily</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="reportType" id="weekly" value="weekly">
+          <label class="form-check-label" for="weekly">Weekly</label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="radio" name="reportType" id="monthly" value="monthly">
+          <label class="form-check-label" for="monthly">Monthly</label>
+        </div>
+        <button type="submit" class="btn btn-primary mt-3">Generate Report</button>
+      </form>
+
+      <div id="reportTable" class="table-responsive" style="display: none;">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Sales Count</th>
+              <th>Total Revenue</th>
+              <th>Offer Discount</th>
+              <th>Coupon Discount</th>
+            </tr>
+          </thead>
+          <tbody id="reportBody"></tbody>
+        </table>
+
+
+<div>
+    <p>Total Sales Count: <span id="totalSalesCount">0</span></p>
+    <p>Total Revenue: <span id="total">0.00</span></p>
+    <p>Total Discount: <span id="totalDiscount">0.00</span></p>
+    <p>Total Coupons Deducted: <span id="totalCouponDiscount">0.00</span></p>
+     
+</div>
+
+
+        <button id="downloadPDF" class="btn btn-danger">Download PDF</button>
+        <button id="downloadExcel" class="btn btn-success">Download Excel</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  {{> admin/footer}}
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
+ 
+
+<script>
+    const form = document.getElementById('reportForm');
+    const reportTable = document.getElementById('reportTable');
+    const reportBody = document.getElementById('reportBody');
+
+    let currentReportData = []; // To store the report data for downloads
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const reportType = document.querySelector('input[name="reportType"]:checked').value;
+        try {
+            const response = await axios.post('/admin/generate-sales-report', { reportType });
+            const { success, report ,totals  } = response.data;
+            console.log(totals)
+
+            if (success) {
+                currentReportData = report; // Save report data for downloading
+                reportBody.innerHTML = report.map(row => `
+                    <tr>
+                        <td>${row._id.date}</td>
+                        <td>${row.salesCount}</td>
+                        <td>${row.totalRevenue.toFixed(2)}</td>
+                        <td>${row.totalDiscount.toFixed(2)}</td>
+                        <td>${row.couponDiscount.toFixed(2)}</td>
+                    </tr>
+                `).join('');
+                reportTable.style.display = 'block';
+
+                 // Display totals
+            document.getElementById('totalSalesCount').textContent = totals.salesCount;
+            document.getElementById('total').textContent = totals.totalRevenue.toFixed(2);
+            document.getElementById('totalDiscount').textContent = totals.totalDiscount.toFixed(2);
+            document.getElementById('totalCouponDiscount').textContent = totals.couponDiscount.toFixed(2);
+            
+
+
+            }
+        } catch (error) {
+            console.error('Error fetching report:', error);
+        }
+    });
+
+    
+ // Download PDF
+document.getElementById('downloadPDF').addEventListener('click', () => {
+    if (!currentReportData.length) {
+        alert("No data available to download.");
+        return;
+    }
+
+    // Initialize jsPDF
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF();
+
+    // Add title to PDF
+    pdf.text('Sales Report', 14, 10);
+
+    // Define table headers and rows
+    const headers = ['Date', 'Sales Count', 'Total Revenue', 'Offer Discount', 'Coupon Discount'];
+    const rows = currentReportData.map(row => [
+        row._id.date,
+        row.salesCount,
+        row.totalRevenue.toFixed(2),
+        row.totalDiscount.toFixed(2),
+        row.couponDiscount.toFixed(2),
+    ]);
+
+    // Add table to PDF using autoTable plugin
+    pdf.autoTable({
+        head: [headers],
+        body: rows,
+        startY: 20, // Start table below the title
+    });
+
+    // Save the PDF
+    pdf.save('sales_report.pdf');
+});
+
+
+    // Download Excel
+    document.getElementById('downloadExcel').addEventListener('click', () => {
+        const worksheet = XLSX.utils.json_to_sheet(currentReportData.map(row => ({
+            Date: row._id.date,
+            'Sales Count': row.salesCount,
+            'Total Revenue': row.totalRevenue.toFixed(2),
+            'Offer Discount': row.totalDiscount.toFixed(2),
+            'Coupon Discount': row.couponDiscount.toFixed(2),
+        })));
+
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Sales Report');
+        XLSX.writeFile(workbook, 'sales_report.xlsx');
+    });
+</script>
+
+
+
+
+  <!-- Bootstrap JS (Optional) for any interactive features -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+
+
+  <!-- Add these to the <head> section -->
+  
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"
+    integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
+    crossorigin="anonymous"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@1.16.0/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+
+</html>

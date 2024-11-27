@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wallet</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .wallet-container {
+            margin: 20px auto;
+            max-width: 900px;
+        }
+
+        .wallet-balance {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .transactions-container {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .btn-add-funds {
+            margin-top: 10px;
+        }
+
+        .status-completed {
+            color: #28a745;
+            font-weight: bold;
+        }
+
+        .status-pending {
+            color: #ffc107;
+            font-weight: bold;
+        }
+
+        .transaction-card {
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .transaction-card h6 {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .transaction-card .transaction-amount {
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .transaction-card .transaction-status {
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    {{> user/header}}
+
+    <div class="container-fluid p-5">
+        <div class="row">
+            <div class="col-md-3">
+                <div class="list-group">
+                    <a href="/profile" class="list-group-item list-group-item-action">Profile</a>
+                    <a href="/wallet" class="list-group-item list-group-item-action">Wallet</a>
+                    <a href="/myorders" class="list-group-item list-group-item-action">My orders</a>
+                    <a href="/availableCoupons" class="list-group-item list-group-item-action">coupons</a>
+                </div>
+            </div>
+
+
+            <div class="col-md-9 p-5">
+                <!-- Wallet Balance -->
+                <div class="">
+                    <div class="wallet-balance text-center">
+                        <h4>Wallet Balance</h4>
+                        <h2>Rs{{balance}}</h2>
+                        <button class="btn btn-primary btn-add-funds" data-bs-toggle="modal"
+                            data-bs-target="#addFundsModal">Add Funds</button>
+                        <p class="text-muted mt-2">Your balance is available for all purchases.</p>
+                    </div>
+                </div>
+
+                <!-- Recent Transactions -->
+                {{#if transactions.length }}
+                <div>
+                    <div class="transactions-container">
+                        <h4>Recent Transactions</h4>
+
+                        <!-- Table View -->
+                        <table class="table d-none d-md-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {{#each transactions}}
+                                <tr>
+                                    <td>{{this.date}}</td>
+
+                                    <td>{{this.description}}</td>
+                                    <td>Rs{{this.amount}}</td>
+                                    <td>
+                                        <span
+                                            class="{{#if (eq this.type 'credit')}}status-completed{{else}}status-pending{{/if}}">
+                                            {{#if (eq this.type 'credit')}}Credit{{else}}Debit{{/if}}
+                                        </span>
+                                    </td>
+
+                                </tr>
+                                {{/each}}
+                            </tbody>
+                        </table>
+
+                        <!-- Card View (for smaller screens) -->
+                        <div class="d-md-none">
+                            {{#each transactions}}
+                            <div class="transaction-card">
+                                <h6>{{this.description}}</h6>
+                                <p class="mb-1">Date: {{this.date}}</p>
+
+                                <p Amout: Rs{{this.amount}} </p>
+                                <p class="{{#if (eq this.type 'credit')}}status-completed{{else}}status-pending{{/if}}">
+                                    {{#if (eq this.type 'credit')}}Credit{{else}}Debit{{/if}}
+                                </p>
+                            </div>
+                            {{/each}}
+                        </div>
+
+
+                        <a href="/viewAllTransactions"><button class="btn btn-secondary w-100 mt-3">View All
+                                Transactions</button></a>
+                        {{/if}}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Funds Modal -->
+    <div class="modal fade" id="addFundsModal" tabindex="-1" aria-labelledby="addFundsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addFundsModalLabel">Add Funds to Wallet</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <label for="amount" class="form-label">Enter Amount (Rs)</label>
+                    <input type="number" id="amount" class="form-control" placeholder="Enter amount" min="1" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" id="topupNow" class="btn btn-primary">Topup Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {{> user/footer}}
+
+
+    <script>
+        document.getElementById('topupNow').addEventListener('click', function () {
+            const amount = document.getElementById('amount').value;
+
+            if (!amount || amount <= 0) {
+                alert('Please enter a valid amount');
+                return;
+            }
+
+            fetch('/wallet-topup', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount: amount * 100 }) // Amount in paisa
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const options = {
+                            key: "rzp_test_4MBYamMKeUifHI",  
+                            amount: data.amount, // Amount in paisa
+                            currency: "INR",
+                            order_id: data.order_id,
+                            name: "READVIBES",  // Your company's name
+                            description: "Wallet top up",
+                            image: "https://example.com/logo.png",
+                            handler: function (response) {
+                                console.log("Payment response received:", response);
+                                fetch('/verify-WalletPayment', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({
+                                        razorpay_payment_id: response.razorpay_payment_id,
+                                        razorpay_order_id: response.razorpay_order_id,
+                                        razorpay_signature: response.razorpay_signature,
+                                        amount: data.amount, // Amount in paisa
+                                    })
+                                })
+                                    .then(verifyResponse => verifyResponse.json())
+                                    .then(verifyData => {
+                                        console.log("Verification response:", verifyData);
+                                        if (verifyData.success) {
+                                            alert("Wallet successfully updated!");
+                                            location.reload();
+                                        } else {
+                                            console.error("Verification failed:", verifyData.message);
+                                            alert("Payment verification failed: " + verifyData.message);
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.error("Error verifying payment:", err);
+                                        alert("An error occurred during payment verification.");
+                                    });
+                            }
+                            ,
+                            theme: { color: "#3399cc" }
+                        };
+                        const rzp = new Razorpay(options);
+                        rzp.open();
+                    } else {
+                        alert("Failed to create payment order");
+                    }
+                })
+                .catch(err => {
+                    console.error("Error creating order:", err);
+                });
+        });
+
+
+    </script>
+
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</body>
+
+</html>

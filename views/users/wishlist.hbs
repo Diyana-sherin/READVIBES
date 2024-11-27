@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wishlist Page</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+ 
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        a {
+            color: black;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .wishlist-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            flex-wrap: wrap;
+        }
+
+        .wishlist-items {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            width: 100%;
+            max-width: 750px;
+        }
+
+        .wishlist-item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            display: flex;
+            width: 100%;
+            max-width: 48%;
+            padding: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            flex-wrap: wrap;
+        }
+
+        .wishlist-item img {
+            width: 120px;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 15px;
+        }
+
+        .book-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .book-title {
+            font-size: 1em;
+            font-weight: bold;
+        }
+
+        .book-author {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .book-price {
+            font-size: 1em;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0;
+        }
+
+        .icon-container {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .cart-icon,
+        .delete-icon {
+            font-size: 1.5em;
+            cursor: pointer;
+            transition: color 0.3s ease, transform 0.2s ease;
+        }
+
+        .cart-icon {
+            color: black;
+        }
+
+        .delete-icon {
+            color: #333;
+        }
+
+
+
+
+        .delete-icon {
+            color: #333;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .error-box {
+            color: red;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .wishlist-container {
+                flex-direction: column;
+            }
+
+            .wishlist-item {
+                max-width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    {{> user/header}}
+    <div class="wishlist-container">
+        <div class="wishlist-items">
+            {{#if wishlistItems.length}}
+            {{#each wishlistItems}}
+            <div class="wishlist-item">
+                <img src="/uploads/product-images/{{this.productImage}}" alt="{{this.bookName}}">
+                <div class="book-info">
+                    <div class="book-title">{{this.bookName}}</div>
+                    <div class="book-author">by {{this.authorName}}</div>
+                    {{#if this.offerName}}
+                    <div class="book-price">Price: RS.
+                   <span class="original-price"
+                        style="text-decoration: line-through; color: #888;">₹{{this.salePrice}}</span>
+                    </div>
+                <p style="font-size: 1.1rem; color: #388e3c;">{{this.discount}}% discount</p>
+                {{/if}}
+                    <div class="book-price">Price: RS. {{#if this.offerName}} {{this.offerPrice}} {{else}} {{this.salePrice}}{{/if}} </div>
+
+                    <div class="icon-container">
+                        <i class="fa fa-shopping-cart cart-icon" title="Move to Cart" data-id="{{this.id}}"></i>
+                        <i class="fas fa-trash delete-icon" title="Remove item" onclick="deleteItem('{{this.id}}')"></i>
+                    </div>
+                </div>
+            </div>
+            {{/each}}
+            {{else}}
+             <div class="container" style="text-align: center;">
+                <div><img src="https://rortvest.com/assets/frontend/view/theme/OTOPC01/stylesheet/OnTheme/images/request-not-found.jpg" alt=""></div>
+            <p>Your Wishlist is empty.</p>
+            <a href="/viewmore">Explore collections </a>
+            </div>
+            {{/if}}
+        </div>
+    </div>
+    {{> user/footer}}
+
+    <script>
+
+
+        async function deleteItem(itemId) {
+            try {
+                const confirmation = await Swal.fire({
+                    title: 'Are you sure?',
+                    text: "Do you want to remove this item from your wishlist?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!',
+                    cancelButtonText: 'Cancel'
+                });
+
+                if (!confirmation.isConfirmed) {
+                    return;
+                }
+
+                const response = await fetch(`/wishlist/delete-item/${itemId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to delete item');
+                }
+
+                const result = await response.json();
+                if (result.success) {
+                    const wishlistItemElement = document.querySelector(`.wishlist-item .delete-icon[onclick="deleteItem('${itemId}')"]`).closest('.wishlist-item');
+                    if (wishlistItemElement) {
+                        wishlistItemElement.remove();
+                    } else {
+                        console.error('Wishlist item element not found for ID:', itemId);
+                    }
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted!',
+                        text: 'Item has been removed from your wishlist.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                    location.reload(); 
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: result.message || 'Unable to delete item',
+                    });
+                }
+            } catch (error) {
+                console.error('Error deleting item:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: 'An error occurred while deleting the item. Please try again.',
+                });
+            }
+        }
+
+
+       document.querySelectorAll('.cart-icon').forEach(icon => {
+            icon.addEventListener('click', async function () {
+                const itemId = this.getAttribute('data-id');
+
+                try {
+                    const response = await fetch(`/addToCart/${itemId}`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+
+                    const result = await response.json();
+                    if (response.ok) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Added to Cart!',
+                            text: result.message,
+                            timer: 1500,
+                            toast: true,
+                            position: 'top-end',
+                            showConfirmButton: false
+                        });
+
+                          const res = await fetch(`/wishlist/delete-item/${itemId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+
+                if (!res.ok) {
+                    throw new Error('Failed to delete item');
+                }
+
+                const DelResult = await res.json();
+                if (DelResult.success) {
+                    const wishlistItemElement = document.querySelector(`.wishlist-item .delete-icon[onclick="deleteItem('${itemId}')"]`).closest('.wishlist-item');
+                    if (wishlistItemElement) {
+                        wishlistItemElement.remove();
+                    } else {
+                        console.error('Wishlist item element not found for ID:', itemId);
+                    }
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Deleted!',
+                        text: 'Item has been removed from your wishlist.',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                     location.reload(); 
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: DelResult.message || 'Unable to delete item',
+                    });
+                }
+
+
+                    } else {
+                        Swal.fire('Error', result.message || 'Failed to add to cart.', 'error');
+                    }
+                } catch (error) {
+                    console.error(error);
+                    Swal.fire('Error', 'An unexpected error occurred.', 'error');
+                }
+            });
+        });
+
+    </script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+
+</html>
