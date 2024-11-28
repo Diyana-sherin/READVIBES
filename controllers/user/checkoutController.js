@@ -556,9 +556,7 @@ const placeOrder = async (req, res) => {
             const coupon = await Coupon.findOne({ couponCode });
             console.log(coupon)
             if (coupon) {
-                perCouponDiscount = coupon.discount / (orderedItems.length);
-                itemPerDiscount = (100 - perCouponDiscount ) /100
-
+                
                 couponDiscount = finalAmount;
                 finalAmount = finalAmount * ((100 - coupon.discount) / 100);
                 couponDiscount = (couponDiscount - finalAmount)/(orderedItems.length);
@@ -609,8 +607,8 @@ const placeOrder = async (req, res) => {
                     orderedItems: [item],
                     totalPrice: item.price * item.quantity,
                     couponDiscount,
-                    perCouponDiscount,
-                    finalAmount: item.finalAmount *   itemPerDiscount ,
+                  
+                    finalAmount: item.finalAmount - couponDiscount ,
                     orderAddress,
                     invoiceDate: new Date(),
                     paymentMethod,
@@ -627,6 +625,7 @@ const placeOrder = async (req, res) => {
 
         if (cartId) {
             await Cart.findByIdAndDelete(cartId);
+            
         }
 
         await Promise.all(

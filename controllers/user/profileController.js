@@ -273,7 +273,7 @@ const myOrders = async (req, res) => {
                 offerDiscount : item.perOfferDiscount,
                 offerPrice : item.price * ((100 - item.perOfferDiscount )/100),
             })),
-            couponDiscount : order.perCouponDiscount,
+            couponDiscount : order.couponDiscount.toFixed(2),
             userAddress: `${order.orderAddress[0].name},${order.orderAddress[0].houseName},${order.orderAddress[0].city},
             ${order.orderAddress[0].landMark},${order.orderAddress[0].state},${order.orderAddress[0].pincode},
             ${order.orderAddress[0].phone},${order.orderAddress[0].altPhone}`,

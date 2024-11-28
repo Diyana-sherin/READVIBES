@@ -53,7 +53,7 @@ const loadOrderPage = async (req, res) => {
             totalPrice: order.totalPrice,
             finalAmount: order.finalAmount,
             offerDiscount: order.orderedItems.map(item => item.perOfferDiscount ?? 1).join(', '),
-            couponDiscount: order.perCouponDiscount,
+            couponDiscount: order.couponDiscount.toFixed(2),
             orderedAt: order.createdAt ? order.createdAt.toISOString().split("T")[0] : null,
             status: order.status,
             paymentMethod : order.paymentMethod,

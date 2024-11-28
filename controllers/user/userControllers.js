@@ -185,9 +185,10 @@ const verifyOtp = async (req, res) => {
             req.session.user = newUser._id;
 
             const referredUser = await User.findOne({ referalCode: user.referalCode })
-            const referredUserId = referredUser._id;
-            console.log(referredUserId)
+            
             if (referredUser) {
+                const referredUserId = referredUser._id;
+                console.log(referredUserId)
                 let wallet = await Wallet.findOne({ userId: referredUserId });
 
                 // If wallet doesn't exist, create one

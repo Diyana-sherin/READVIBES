@@ -170,7 +170,7 @@
                             <p class="status {{order.status}}">Status: {{order.status}}</p>
                             <p>Payment Method: {{order.paymentMethod}}</p>
                             <p>Total Price: Rs {{order.totalPrice}}</p>
-                              <p>Coupon Discount: {{order.couponDiscount}}%</p>
+                              <p>Coupon Discount: Rs {{order.couponDiscount}}</p>
                             <p>Final Amount: Rs {{order.finalAmount}}</p>
                             <div class="order-actions">
                                 {{#if (and (or (eq order.status "Pending") (eq order.status "Processing")) (not
@@ -233,7 +233,7 @@
                                             <p class="status ${order.status}">Status: ${order.status}</p>
                                             <p>Payment Method: ${order.paymentMethod}</p>
                                             <p>Total Price: Rs ${order.totalPrice}</p>
-                                             <p>Coupon Discount: ${order.couponDiscount}%</p>
+                                             <p>Coupon Discount: Rs ${order.couponDiscount}</p>
                                             <p>Final Amount: Rs ${order.finalAmount}</p>
                                             <div class="order-actions">
                                                 ${(() => {
