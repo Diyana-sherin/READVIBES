@@ -240,6 +240,23 @@ const updateStatus = async (req, res) => {
   };
   
 
+  const deleteBook = async (req,res)=>{
+    try {
+        const bookId = req.params.id;
+        const deletedBook = await Books.findByIdAndDelete(bookId);
+
+        if (deletedBook) {
+            res.status(200).json({ success: true, message: "Book deleted successfully." });
+        } else {
+            res.status(404).json({ success: false, message: "Book not found." });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal server error." });
+    }
+}
+
+
 
 
 module.exports = {
@@ -251,6 +268,7 @@ module.exports = {
     updateStatus,
     
     updateBookStatus,
+    deleteBook
 }
 
 

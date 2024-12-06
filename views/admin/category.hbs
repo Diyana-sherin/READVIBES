@@ -139,6 +139,8 @@
                             </td>
                             <td>
                                 <a href="/admin/editCategory/{{this._id}}" class="btn btn-secondary btn-sm">Edit</a>
+                                 <a href="#" class="btn btn-danger btn-sm"
+                                    onclick="confirmDeleteCategory('{{this._id}}')">Delete</a>
                             </td>
                         </tr>
                         {{/each}}
@@ -180,7 +182,43 @@
                 window.location.href = `/admin/category/${action}/${categoryId}`;
             }
         }
+
+
+
+
+          function confirmDeleteCategory(catId) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "This action will permanently delete the Category.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "Cancel"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/deleteCat/${catId}`, {
+                        method: "DELETE"
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                Swal.fire("Deleted!", "The category has been deleted.", "success")
+                                    .then(() => window.location.reload());
+                            } else {
+                                Swal.fire("Error!", data.message, "error");
+                            }
+                        })
+                        .catch((error) => {
+                            Swal.fire("Error!", "An error occurred.", "error");
+                            console.error(error);
+                        });
+                }
+            });
+        }
     </script>
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"
     integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"

@@ -25,15 +25,157 @@ const loadHome = async (req, res) => {
         bookData.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         bookData = bookData.slice(0, 4);
 
-        let collections = await Books.find(
-            {
-                isBlocked: false,
-                category: { $in: categories.map(category => category._id) }, quantity: { $gt: 0 }
-            }
-        )
-        collections = collections.slice(0, 4);
+        const books = bookData.map(item => ({
+            ...item.toObject(),
+            category: item.category.name,
+        }))
 
-        res.render('users/homeBfLog', { Newbooks: bookData, books: collections });
+        for (let item of books) {
+            console.log(item.bookName)
+            const catOffers = await Offer.find({ category: item.category })
+            const bookOffers = await Offer.find({ bookName: item.bookName })
+            catOffers.sort((a, b) => b.discount - a.discount)
+            bookOffers.sort((a, b) => b.discount - a.discount)
+            //console.log(catOffers)
+            // console.log(bookOffers)
+            if (!catOffers && !bookOffers) {
+                console.log("ok")
+                continue;
+            }
+
+            function isExpired(offer) {
+                const currentDate = new Date();
+                const offerExpiredDate = new Date(offer.endDate);
+
+                return offerExpiredDate < currentDate || offer.status === "Expired";
+
+            }
+
+            //Finding largest offers of books 
+            let greatestDiscountbookOffer = null;
+            for (let offer of bookOffers) {
+                if (!isExpired(offer)) {
+                    greatestDiscountbookOffer = offer;
+                    break;
+                }
+            }
+            //Finding largest offers of category
+            let greatestDiscountcatOffer = null;
+            for (let offer of catOffers) {
+                if (!isExpired(offer)) {
+                    greatestDiscountcatOffer = offer;
+                    break;
+                }
+            }
+            if (!greatestDiscountcatOffer && !greatestDiscountbookOffer) {
+                console.log(`No valid offers for ${item.bookName}. Moving to the next item.`);
+                continue;
+            }
+            else if (!greatestDiscountcatOffer) {
+                offer = greatestDiscountbookOffer;
+            }
+            else if (!greatestDiscountbookOffer) {
+                offer = greatestDiscountcatOffer;
+            }
+            else {
+                offer = greatestDiscountbookOffer.discount > greatestDiscountcatOffer.discount ? greatestDiscountbookOffer : greatestDiscountcatOffer
+            }
+            console.log(offer)
+            item.offerName = offer.offerName;
+            item.discount = offer.discount;
+            item.offerPrice = item.salePrice * ((100 - offer.discount) / 100);
+
+        }
+        console.log(books)
+
+
+
+        //collections 
+
+        let collection = await Books.find({
+            isBlocked: false,
+            category: { $in: categories.map(category => category._id) },
+            quantity: { $gt: 0 }
+        })
+            .populate("category");
+
+
+
+        collection = collection.slice(0, 4);
+        // console.log(collection)
+
+
+        const collections = collection.map(item => ({
+            ...item.toObject(),
+            category: item.category.name,
+
+        }));
+
+
+        for (let item of collections) {
+            console.log(item.bookName)
+            const catOffers = await Offer.find({ category: item.category })
+            const bookOffers = await Offer.find({ bookName: item.bookName })
+            catOffers.sort((a, b) => b.discount - a.discount)
+            bookOffers.sort((a, b) => b.discount - a.discount)
+            //console.log(catOffers)
+            // console.log(bookOffers)
+            if (!catOffers && !bookOffers) {
+                console.log("ok")
+                continue;
+            }
+
+            function isExpired(offer) {
+                const currentDate = new Date();
+                const offerExpiredDate = new Date(offer.endDate);
+
+                return offerExpiredDate < currentDate || offer.status === "Expired";
+
+            }
+
+            //Finding largest offers of books 
+            let greatestDiscountbookOffer = null;
+            for (let offer of bookOffers) {
+                if (!isExpired(offer)) {
+                    greatestDiscountbookOffer = offer;
+                    break;
+                }
+            }
+            //Finding largest offers of category
+            let greatestDiscountcatOffer = null;
+            for (let offer of catOffers) {
+                if (!isExpired(offer)) {
+                    greatestDiscountcatOffer = offer;
+                    break;
+                }
+            }
+            if (!greatestDiscountcatOffer && !greatestDiscountbookOffer) {
+                console.log(`No valid offers for ${item.bookName}. Moving to the next item.`);
+                continue;
+            }
+            else if (!greatestDiscountcatOffer) {
+                offer = greatestDiscountbookOffer;
+            }
+            else if (!greatestDiscountbookOffer) {
+                offer = greatestDiscountcatOffer;
+            }
+            else {
+                offer = greatestDiscountbookOffer.discount > greatestDiscountcatOffer.discount ? greatestDiscountbookOffer : greatestDiscountcatOffer
+            }
+            console.log(offer)
+            item.offerName = offer.offerName;
+            item.discount = offer.discount;
+            item.offerPrice = item.salePrice * ((100 - offer.discount) / 100);
+
+
+
+
+        }
+        //console.log(collections)
+
+
+
+        res.render('users/homeBfLog', { Newbooks: books, books: collections });
     } catch {
         console.log("Home page not found");
         res.status(500).send("Server Error")
@@ -527,10 +669,21 @@ const loadviewMore = async (req, res) => {
         const categories = await Category.find({ status: "listed" })
         const sortOption = req.query.sort || 'new';
         const searchQuery = req.query.search || '';
-        //const filterCategories = req.query.categories ? req.query.categories.split(',') : []; // Selected categories
-
-
+        const selectedCategory = req.query.category || 'All';
+       
         console.log(searchQuery)
+
+        let categoryFilter = {};
+        if (selectedCategory !== 'All') {
+            const category = categories.find(cat => cat.name === selectedCategory);
+            if (category) {
+                categoryFilter.category = category._id;
+            } else {
+                return res.status(404).send('Category not found');
+            }
+        } else {
+            categoryFilter.category = { $in: categories.map(cat => cat._id) };
+        }
 
         let sortCriteria;
 
@@ -549,7 +702,8 @@ const loadviewMore = async (req, res) => {
 
         const searchCriteria = {
             isBlocked: false,
-            category: { $in: categories.map((category) => category._id) },
+           // category: { $in: categories.map((category) => category._id) },
+           ...categoryFilter,
             quantity: { $gt: 0 },
             $or: [
                 { bookName: { $regex: searchQuery, $options: 'i' } },
@@ -557,13 +711,7 @@ const loadviewMore = async (req, res) => {
             ]
         };
 
-        /*if (filterCategories.length > 0) {
-            searchCriteria.category = { $in: filterCategories };
-        } else {
-            // Default: show all listed categories
-            searchCriteria.category = { $in: categories.map((category) => category._id) };
-        }
-*/
+       
 
 
         const bookData = await Books.find(searchCriteria).sort(sortCriteria)
@@ -635,11 +783,6 @@ const loadviewMore = async (req, res) => {
             item.discount = offer.discount;
             item.offerPrice = item.salePrice * ((100 - offer.discount) / 100);
 
-
-
-
-
-
         }
 
         console.log(books)
@@ -653,7 +796,8 @@ const loadviewMore = async (req, res) => {
                 { name: "viewmore", url: "/viewmore" }
             ],
             sortOption,
-            searchQuery
+            searchQuery,
+            selectedCategory
         });
     } catch (error) {
         console.error(error);
@@ -662,31 +806,7 @@ const loadviewMore = async (req, res) => {
 };
 
 
-const filterBooks = async (req, res) => {
-    try {
-        const { category } = req.body;
-        const categories = await Category.find({ name: category })
-        console.log(categories[0]._id)
 
-        // Fetch books based on the selected category
-        let query = {};
-        if (category && category !== 'All') {
-            query.category = categories[0]._id;
-        }
-
-
-
-        console.log(query)
-
-        const books = await Books.find(query)
-        console.log(books)
-
-        res.json({ success: true, books });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: 'Failed to filter books' });
-    }
-};
 
 
 
@@ -697,13 +817,20 @@ const bookDetails = async (req, res) => {
     try {
         const bookId = req.params.id;
         const categories = await Category.find({ isListed: true })
+
+        const books = await Books.findById(bookId)
+        .populate("category")
+
+        //console.log("Cat",books.category.name)
+
+
         let bookData = await Books.find(
-            {
-                isBlocked: false,
-                category: { $in: categories.map(category => category._id) }, quantity: { $gt: 0 }
+            { 
+                category : books.category._id, _id: { $ne: bookId } ,quantity: { $gt: 0 }
             }
         )
             .populate("category")
+        console.log("Listed",bookData)
 
 
         bookData = bookData.slice(0, 4);
@@ -775,13 +902,13 @@ const bookDetails = async (req, res) => {
         }
 
 
-        console.log(ListedBooks)
+        //console.log(ListedBooks)
         // console.log(bookId)
 
 
 
-        const books = await Books.findById(bookId)
-            .populate("category")
+       /* const books = await Books.findById(bookId)
+            .populate("category")*/
 
 
         console.log(books._id)
@@ -865,7 +992,7 @@ const bookDetails = async (req, res) => {
 
 
 
-        console.log(offer)
+       // console.log(offer)
 
         const offerDetails = {
             name: offer.offerName,
@@ -874,7 +1001,7 @@ const bookDetails = async (req, res) => {
             offerPrice: books.salePrice * ((100 - offer.discount) / 100)
         }
 
-        console.log(offerDetails)
+       // console.log(offerDetails)
         //end of offers
 
         //console.log(books);
@@ -925,6 +1052,6 @@ module.exports = {
     loadviewMore,
     bookDetails,
     logout,
-    filterBooks
+   
 
 }

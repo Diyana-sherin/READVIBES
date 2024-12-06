@@ -11,6 +11,10 @@ const Razorpay = require('razorpay');
 const crypto = require('crypto');
 const env = require('dotenv').config()
 
+const PDFDocument = require("pdfkit");
+const fs = require("fs");
+const path = require("path");
+
 
 
 
@@ -237,7 +241,7 @@ const addAddress = async (req, res) => {
             address = new Address({ userId, address: [] })
             await address.save();
             console.log('Created')
-            // Update user document with new  reference
+            // update user document with new  reference
             await User.findByIdAndUpdate(userId, { $push: { address: address._id } });
             console.log('Created and added  reference to user');
         }
@@ -445,6 +449,7 @@ const placeOrder = async (req, res) => {
         let finalAmount = 0;
         let perCouponDiscount = 0;
         let itemPerDiscount = 1;
+        let deliveryCharge = 0;
         let offer;
 
         if (cartId) {
@@ -466,6 +471,7 @@ const placeOrder = async (req, res) => {
                 quantity: item.quantity,
                 price: item.price,
                 salePrice: item.bookId.salePrice,
+                status :  paymentMethod === "online" ? "Pending" : "Processing",
             }));
 
             for (const item of orderedItems) {
@@ -495,9 +501,14 @@ const placeOrder = async (req, res) => {
                 item.finalAmount = offer
                     ? (item.salePrice * ((100 - offer.discount) / 100)) * item.quantity
                     : item.salePrice * item.quantity;
+                item.offerDiscount = (item.salePrice *item.quantity) - item.finalAmount;
             }
 
+
             finalAmount = orderedItems.reduce((total, item) => total + item.finalAmount, 0);
+            totalPrice = cart.items.reduce((sum, item) => sum + item.totalPrice, 0);
+            console.log(orderedItems)
+
         } else if (singleBookId) {
             const book = await Books.findById(singleBookId).populate("category");
             if (!book) {
@@ -534,6 +545,7 @@ const placeOrder = async (req, res) => {
                 offerDiscount: book.salePrice - finalAmount,
                 perOfferDiscount: offer ? offer.discount : 0,
                 finalAmount,
+                status :  paymentMethod === "online" ? "Pending" : "Processing",
             });
 
             totalPrice = finalAmount;
@@ -565,6 +577,35 @@ const placeOrder = async (req, res) => {
             }
         }
 
+        
+
+      
+         const ordered = orderedItems.map(item => ({
+            
+            ...item,
+            finalAmount : item.finalAmount - couponDiscount,
+            couponDiscount : couponDiscount,
+          }));
+
+          if(finalAmount > 2000)
+          {
+            deliveryCharge =  150;
+          }
+          else if( finalAmount>1000)
+          {
+            deliveryCharge = 100;
+          }
+          else if (finalAmount >500)
+          {
+            deliveryCharge = 50;
+          }
+          console.log(deliveryCharge)
+          console.log(finalAmount)
+
+          finalAmount += deliveryCharge;
+
+        
+
         let razorpayOrder;
         if (paymentMethod === "online") {
             razorpayOrder = await razorpay.orders.create({
@@ -574,54 +615,64 @@ const placeOrder = async (req, res) => {
             });
         }
 
+
         if(paymentMethod === 'wallet')
-        {
-            let wallet = await Wallet.findOne({ userId });
+            {
+                let wallet = await Wallet.findOne({ userId });
+    
+            if (!wallet) 
+            {
+                 return res.json({ error: 'Payment error: Insufficient wallet balance.' })
+            }
+    
+            if (wallet.balance < finalAmount)
+            {
+                return res.json({ error: 'Payment error: Insufficient wallet balance.' })
+            }
+    
+            const transactionEntry = {
+                date: new Date(),
+                type: 'debit',
+                amount: finalAmount,
+                description: 'Purchase',
+            };
+    
+            wallet.balance -= finalAmount;
+            wallet.transactions.push(transactionEntry);
+            await wallet.save();
+    
+          
+    
+            }
+    
 
-        if (!wallet) 
-        {
-             return res.json({ error: 'Payment error: Insufficient wallet balance.' })
-        }
-
-        if (wallet.balance < finalAmount)
-        {
-            return res.json({ error: 'Payment error: Insufficient wallet balance.' })
-        }
-
-        const transactionEntry = {
-            date: new Date(),
-            type: 'debit',
-            amount: finalAmount,
-            description: 'Purchase',
-        };
-
-        wallet.balance -= finalAmount;
-        wallet.transactions.push(transactionEntry);
-        await wallet.save();
-        }
-
-        const createdOrders = await Promise.all(
-            orderedItems.map(async (item) => {
+       
                 const newOrder = new Order({
                     userId,
-                    orderedItems: [item],
-                    totalPrice: item.price * item.quantity,
+                    orderedItems :ordered,
+                    totalPrice,
                     couponDiscount,
                   
-                    finalAmount: item.finalAmount - couponDiscount ,
+                    finalAmount,
+                    deliveryCharge, 
                     orderAddress,
                     invoiceDate: new Date(),
                     paymentMethod,
+                    paymentStatus : paymentMethod === "online" ? "Pending" : paymentMethod,
                     razorpayOrderId: razorpayOrder?.id || null,
-                    status: paymentMethod === "online" ? "Pending" : "Processing",
+
                     expectedDeliveryDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
                 });
 
                 await newOrder.save();
                 await User.findByIdAndUpdate(userId, { $push: { order: newOrder._id } });
-                return newOrder._id;
-            })
-        );
+              
+            
+        
+
+            
+
+        console.log(newOrder)
 
         if (cartId) {
             await Cart.findByIdAndDelete(cartId);
@@ -636,7 +687,7 @@ const placeOrder = async (req, res) => {
 
         res.status(201).json({
             message: "Order placed successfully",
-            orderId: createdOrders,
+            orderId: newOrder._id,
             razorpayOrderId: razorpayOrder?.id || null,
         });
     } catch (error) {
@@ -660,10 +711,24 @@ const verifyPayment = async (req, res) => {
 
     if (expectedSignature === razorpaySignature) {
         // Payment is verified
-        for (item of orderId) {
-            await Order.findByIdAndUpdate(item, { status: "Processing" });
-        }
-        res.json({ success: true });
+    
+            const order =  await  Order.findOne({_id:orderId})
+            
+            order.orderedItems.forEach(async (item) => {
+                item.status = "Processing";
+            });
+            order.paymentStatus = "online"
+            await order.save();
+            //console.log(order.orderedItems)
+    
+        
+        //res.json({ success: true });
+
+        res.status(201).json({
+            success: true,
+            orderId : orderId,
+        });
+        
     } else {
         res.json({ success: false });
     }
@@ -671,33 +736,197 @@ const verifyPayment = async (req, res) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
-const orderSuccessPage = async (req, res) => {
+const retryPayment = async (req, res) => {
     try {
-        res.render('users/orderSuccess')
+      const { orderId } = req.body;
+  
+      const orderData = await Order.findOne({ _id: orderId })
+        .populate({
+          path: 'orderedItems.book',
+          populate: { path: 'category', select: 'name' }
+        })
+        .populate({
+          path: 'userId',
+          select: 'name email phone'
+        });
+  
+      if (!orderData) {
+        return res.status(404).json({ error: "Order not found" });
+      }
+  
+      const razorpayOrderId = orderData.razorpayOrderId || null;
+  
+      res.status(201).json({
+        message: "Retry initiated",
+        orderId: orderData._id,
+        razorpayOrderId: razorpayOrderId,
+        finalAmount: orderData.totalAmount,
+        customerName: orderData.userId.name,
+        customerEmail: orderData.userId.email,
+        customerPhone: orderData.userId.phone,
+        selectedAddress: orderData.shippingAddress
+      });
     } catch (error) {
-        console.log(error)
+      console.error("Error retrying payment:", error);
+      res.status(500).json({ error: "Internal server error" });
+    }
+  };
+  
+
+
+
+
+
+
+
+
+
+ const orderSuccessPage = async (req, res) => {
+    try {
+        const orderId = req.params.id;
+        
+        const orderData = await Order.findOne({ _id: orderId })
+            .populate({
+                path: 'orderedItems.book',
+                populate: { path: 'category', select: 'name' }
+            })
+            .populate({
+                path: 'userId',
+                select: 'name email phone'
+            })
+
+            
+        const formatOrder = (order) => ({
+            id: order._id,
+            items: order.orderedItems.map(item => ({
+                id: item._id,
+                bookName: item.book ? item.book.bookName : 'Unknown Book',
+                quantity: item.quantity,
+                price: item.price,
+                offerDiscount: item.offerDiscount,
+               perOfferDiscount : item.perOfferDiscount,
+                productImage: item.book.productImage[0],
+                status:item.status,
+                finalAmount : item.finalAmount,
+                couponDiscount: item.couponDiscount.toFixed(2),
+            })),
+            finalAmount: order.finalAmount,
+            deliveryCharge : order.deliveryCharge,
+            totalPrice: order.totalPrice,
+            paymentMethod: order.paymentMethod,
+            offerDiscount: order.orderedItems.map(item => item.offerDiscount ?? 1).join(', '),
+          
+            orderedAt: order.createdAt ? order.createdAt.toISOString().split("T")[0] : null,
+           
+            userAddress: `${order.orderAddress[0].name},${order.orderAddress[0].houseName},${order.orderAddress[0].city},
+            ${order.orderAddress[0].landMark},${order.orderAddress[0].state},${order.orderAddress[0].pincode},
+            ${order.orderAddress[0].phone},${order.orderAddress[0].altPhone}`,
+
+            userName: order.userId?.name || "Not available",
+            userEmail: order.userId?.email || "Not available",
+            userPhone: order.userId?.phone || "Not available"
+        });
+        const formattedOrder = formatOrder(orderData);
+
+        res.render('users/orderDetails',{order : formattedOrder})
+
+    } catch (error) {
+        console.error("Error fetching order details:", error);
     }
 }
 
 
 
 
+const download = async (req, res) => {
+    try {
+        const { orderId } = req.body;
 
+        if (!orderId) {
+            return res.status(400).send("Order ID is required");
+        }
 
+        const order = await Order.findOne({ _id: orderId }).populate("orderedItems.book");
 
+        if (!order) {
+            return res.status(404).send("Order not found");
+        }
 
+        // Create a new PDF document
+        const PDFDocument = require('pdfkit');
+        const doc = new PDFDocument();
 
+        // Configure response headers
+        res.setHeader("Content-Type", "application/pdf");
+        res.setHeader("Content-Disposition", `attachment; filename=invoice-${orderId}.pdf`);
 
+        // Pipe the PDF into the response
+        doc.pipe(res);
+
+        // Add content to the PDF
+        doc.fontSize(20).text("Invoice", { align: "center" });
+        doc.fontSize(14).text(`Order ID: ${order.orderId}`, { align: "left" });
+        doc.text(`Date: ${new Date(order.createdAt).toLocaleDateString()}`, { align: "left" });
+        doc.text(`Payment Method: ${order.paymentMethod}`, { align: "left" });
+        doc.moveDown();
+
+        doc.fontSize(16).text("Shipping Address:", { underline: true });
+        const address = order.orderAddress[0];
+        doc.fontSize(12).text(`${address.name}`);
+        doc.text(`${address.houseName}, ${address.city}, ${address.state}, ${address.pincode}`);
+        doc.text(`Phone: ${address.phone}`);
+        doc.moveDown();
+
+        doc.fontSize(16).text("Ordered Items:", { underline: true });
+        order.orderedItems.forEach((item, index) => {
+            doc.fontSize(12).text(`${index + 1}. ${item.bookName} - Qty: ${item.quantity}, Price: Rs ${item.price},
+                Discount: Rs ${item.offerDiscount} , OfferPrice: Rs ${ item.price * ((100 - item.offerDiscount) / 100)}, Coupon Discount: Rs  ${item.couponDiscount} ,
+                Final: Rs  ${item.finalAmount} `);
+        });
+
+        doc.moveDown();
+        doc.fontSize(14).text(`Total Price: Rs ${order.totalPrice}`);
+        doc.fontSize(14).text(`Delivery Charge: Rs ${order.deliveryCharge}`);
+        doc.text(`Final Amount: Rs ${order.finalAmount}`);
+
+        // Finalize the PDF
+        doc.end();
+    } catch (error) {
+        console.error(error);
+        res.status(500).send("Error generating invoice");
+    }
+};
+
+const axios = require('axios');
+
+/*const distance = async (req, res) => {
+    try {
+        async function getLatLon(pincode) {
+            const apiKey = 'AIzaSyDR4X_1PrKnPxOZWVOMymC5Ng0mtUmjYoc';
+            const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${pincode}&key=${apiKey}`;
+
+            try {
+                const response = await axios.get(url);
+                console.log(response.data); // Log the response for debugging
+                const location = response.data.results[0].geometry.location;
+                return { lat: location.lat, lng: location.lng };
+            } catch (error) {
+                console.error('Error fetching geocode data:', error.message);
+                throw error;
+            }
+        }
+
+        // Call getLatLon with await
+        const { lat, lng } = await getLatLon('560001');
+        console.log(`Latitude: ${lat}, Longitude: ${lng}`);
+
+        // Respond to the route request
+        res.status(200).json({ lat, lng });
+    } catch (error) {
+        console.error("Error in distance function:", error.message);
+        res.status(500).send("Internal Server Error");
+    }
+};*/
 
 
 module.exports = {
@@ -710,4 +939,7 @@ module.exports = {
     validateCOD,
     verifyPayment,
     removeCoupon,
+
+    download,
+    retryPayment,
 }

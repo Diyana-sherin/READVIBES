@@ -1,63 +1,226 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Order Confirmation</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/css/bootstrap.min.css"
+        integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Align card in center */
+        .container-order {
+            margin: 20px;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background-image: url('https://source.unsplash.com/1600x900/?shopping,store');
+            /* Attractive background */
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* Card container */
+        .success-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            text-align: center;
+            max-width: 450px;
+            width: 90%;
+        }
+
+        /* Success icon */
+        .success-icon {
+            font-size: 5rem;
+            color: #28a745;
+            margin-bottom: 20px;
+        }
+
+        /* Headline */
+        .success-message {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        /* Subtitle */
+        .text-muted {
+            font-size: 1rem;
+            color: #666;
+        }
+
+        /* Buttons container */
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        /* Buttons style */
+        .custom-button {
+            background-color: #be7878;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .custom-button:hover {
+            background-color: #be7878;
+            transform: scale(1.05);
+        }
+
+        /* Order Details Section */
+        .main-content {
+            margin-top: 30px;
+            padding: 20px;
+        }
+    </style>
 </head>
+
 <body>
-      {{> user/header}}
+    <!-- Header Partial -->
+    {{> user/header}}
 
+    <!-- Success Message Section -->
+    <div class="container-order">
+        <div class="success-container">
+            <!-- Success Icon -->
+            <div class="success-icon">
+                <i class="fas fa-check-circle"></i>
+            </div>
 
-      <!-- order-history.hbs -->
-<h6> Orders Deatails</h6>
- <div class="main-content mt-5">
-<div class="card mb-4">
-    <div class="card-body">
-        <h6>Order ID: {{order.id}} <span class="text-success">{{order.status}}</span></h6>
-        <p>Date: </p>
-       
-        <hr>
-        <div class="row">
-            <div class="col-md-4">
-                <p><strong>Contact</strong></p>
-                <p>{{order.userName}}<br>
-                    Phone: {{order.userPhone}}<br>
-                    Email: {{order.userEmail}}</p>
+            <!-- Headline -->
+            <h1 class="success-message">Thank You for Your Order!</h1>
+
+            <!-- Subtitle -->
+            <p class="text-muted">Your order has been successfully placed. You can view your order history or continue
+                shopping.</p>
+
+            <!-- Buttons -->
+            <div class="button-container">
+                <a href="/homelog" class="custom-button">Continue Shopping</a>
+                <a href="/myorders" class="custom-button">Order History</a>
             </div>
-            <div class="col-md-4">
-                <p><strong>Shipping Address</strong></p>
-                <p>{{order.userAddress}}</p>
-            </div>
-            <div class="col-md-4">
-                <p><strong>Payment</strong></p>
-                <p>{{order.paymentMethod}}<br>
-                    Coupon Discount :{{order.couponDiscount}} <br>
-                    Shipping fee: Free<br>
-                    Total paid: Rs{{order.finalAmount}}</p>
-            </div>
-        </div>
-        <hr>
-        <div class="d-flex">
-            {{#each order.items as |item|}}
-            <div class="mr-3">
-                <h5>{{item.bookName}}</h5>
-                <p>
-                    <img src="/uploads/product-images/{{item.productImage}}" alt="Item Image" width="50" height="50"> {{this.name}}<br>
-                   <p>Quantity: {{item.quantity}}</p>
-                    <p>Price: Rs {{item.price}}</p>
-                     <p>offerDiscount:  {{item.offerDiscount}}%</p>
-                      <p>OfferPrice: Rs {{item.offerPrice}}</p>
-                </p>
-            </div>
-           {{/each}}
         </div>
     </div>
-</div>
- </div>
+
+    <!-- Order Details Section -->
+    <div class="main-content mt-5">
+        <div class="container">
+            <h6>Order Details</h6>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h6>Order ID: {{order.id}} <span class="text-success">{{order.status}}</span></h6>
+                        <input type="hidden" value="{{order.id}}" id="Id">
+
+                    <p>Date: {{order.orderedAt}}</p>
+
+                    <hr>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <p><strong>Contact</strong></p>
+                            <p>{{order.userName}}<br>
+                                Phone: {{order.userPhone}}<br>
+                                Email: {{order.userEmail}}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Shipping Address</strong></p>
+                            <p>{{order.userAddress}}</p>
+                        </div>
+                        <div class="col-md-4">
+                            <p><strong>Payment</strong></p>
+                            <p>{{order.paymentMethod}}<br>
+                             
+                                Shipping fee: {{order.deliveryCharge}}<br>
+                                Total paid: Rs {{order.finalAmount}}</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="d-flex">
+                        {{#each order.items as |item|}}
+                        <div class="mr-3">
+                            <h5>{{item.bookName}}</h5>
+                            <p>
+                                <img src="/uploads/product-images/{{item.productImage}}" alt="Item Image" width="50"
+                                    height="50">
+                            <p>Quantity: {{item.quantity}}</p>
+                            <p>Price: Rs {{item.price}}</p>
+                            <p>Offer Discount: {{item.perOfferDiscount}}%</p>
+                            <p>Offer Price: Rs {{item.offerDiscount}}</p>
+                             <p>  Coupon Discount : Rs {{item.couponDiscount}}</p>
+                         <p>  finalAmount : Rs {{item.finalAmount}}</p>
+                            </p>
+                        </div>
+                      
+
+                        {{/each}}
+
+                    </div>
+                     <button class="custom-button" id="downloadPdf">
+                            Download Invoice
+                        </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer Partial -->
+    {{> user/footer}}
+
+<script>
+ document.getElementById('downloadPdf').addEventListener('click', async function () {
+    const orderId = document.getElementById('Id').value;
+    if (!orderId) {
+        console.error("Order ID is missing");
+        return;
+    }
+
+    try {
+        const response = await fetch('/download-invoice', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ orderId: orderId }),
+        });
+
+        if (!response.ok) {
+            console.error("Failed to download the PDF:", response.statusText);
+            return;
+        }
+
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `invoice-${orderId}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+    } catch (error) {
+        console.error("Error downloading the PDF:", error);
+    }
+});
+
+</script>
+
   
-
-
-        {{> user/footer}}
+    <!-- JavaScript Links -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

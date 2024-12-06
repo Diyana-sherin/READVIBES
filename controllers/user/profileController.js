@@ -259,21 +259,25 @@ const myOrders = async (req, res) => {
 
         const orderItems = myorders.map(order => ({
             id: order._id,
-            status: order.status,
+           
             totalPrice: order.totalPrice,
             finalAmount: order.finalAmount,
             paymentMethod:order.paymentMethod,
-            reason : order.reason,
+            paymentStatus : order.paymentStatus,
             items: order.orderedItems.map(item => ({
                 id: item._id,
                 bookName: item.book ? item.book.bookName : 'Unknown Book',
                 quantity: item.quantity,
                 price: item.price,
                 productImage:  item.book.productImage[0]  ,
+                status:item.status,
+                reason: item.reason,
                 offerDiscount : item.perOfferDiscount,
+                couponDiscount: item.couponDiscount.toFixed(2),
                 offerPrice : item.price * ((100 - item.perOfferDiscount )/100),
+                finalAmount : item.finalAmount,
             })),
-            couponDiscount : order.couponDiscount.toFixed(2),
+           
             userAddress: `${order.orderAddress[0].name},${order.orderAddress[0].houseName},${order.orderAddress[0].city},
             ${order.orderAddress[0].landMark},${order.orderAddress[0].state},${order.orderAddress[0].pincode},
             ${order.orderAddress[0].phone},${order.orderAddress[0].altPhone}`,
@@ -301,6 +305,7 @@ const filterOrders = async (req, res) => {
         if (status && status !== 'All') {
             query.status = status;
         }
+        console.log(query)
 
         // Fetch the filtered orders from the database
         const orders = await Order.find(query)
@@ -313,24 +318,27 @@ const filterOrders = async (req, res) => {
         // Transform the orders into the desired format
         const orderItems = orders.map(order => ({
             id: order._id,
-            status: order.status,
             totalPrice: order.totalPrice,
             finalAmount: order.finalAmount,
-            paymentMethod: order.paymentMethod,
-            reason: order.reason,
+            paymentMethod:order.paymentMethod,
+           
             items: order.orderedItems.map(item => ({
                 id: item._id,
                 bookName: item.book ? item.book.bookName : 'Unknown Book',
                 quantity: item.quantity,
                 price: item.price,
-                productImage: item.book.productImage[0],
-                offerDiscount: item.perOfferDiscount,
-                offerPrice: item.price * ((100 - item.perOfferDiscount) / 100),
+                productImage:  item.book.productImage[0]  ,
+                status:item.status,
+                reason: item.reason,
+                offerDiscount : item.perOfferDiscount,
+                couponDiscount: item.couponDiscount.toFixed(2),
+                offerPrice : item.price * ((100 - item.perOfferDiscount )/100),
+                finalAmount : item.finalAmount,
             })),
-            couponDiscount : order.perCouponDiscount,
-            userAddress: `${order.orderAddress[0].name}, ${order.orderAddress[0].houseName}, ${order.orderAddress[0].city},
-            ${order.orderAddress[0].landMark}, ${order.orderAddress[0].state}, ${order.orderAddress[0].pincode},
-            ${order.orderAddress[0].phone}, ${order.orderAddress[0].altPhone}`,
+           
+            userAddress: `${order.orderAddress[0].name},${order.orderAddress[0].houseName},${order.orderAddress[0].city},
+            ${order.orderAddress[0].landMark},${order.orderAddress[0].state},${order.orderAddress[0].pincode},
+            ${order.orderAddress[0].phone},${order.orderAddress[0].altPhone}`,
         }));
 
         // Respond with the filtered orders
@@ -345,7 +353,7 @@ const filterOrders = async (req, res) => {
 };
 
 
-const getOrderCancelPage = async (req,res)=>{
+/*const getOrderCancelPage = async (req,res)=>{
     const orderId = req.params.id;
     console.log(orderId)
     try {
@@ -379,11 +387,94 @@ const getOrderCancelPage = async (req,res)=>{
         console.error("Error canceling order:", error);
       return res.json({ success: false, message: "Internal server error" });
     }
-}
+}*/
+const getOrderCancelPage = async (req, res) => {
+    const itemId = req.params.id;  
+    console.log(itemId);
+  
+    try {
+     
+      const order = await Order.findOne({ "orderedItems._id": itemId })
+        .populate('orderedItems.book'); 
+  
+      if (!order) {
+        return res.status(404).json({ message: 'Order not found for the given item.' });
+      }
+  
+      
+      const item = order.orderedItems.find(item => item._id.toString() === itemId);
+  
+      if (!item) {
+        return res.status(404).json({ message: 'Item not found in this order.' });
+      }
+  
+      
+      const itemDetails = {
+        id  : item._id,
+        bookName: item.bookName,
+        quantity: item.quantity,
+        price: item.price,
+        offerDiscount: item.offerDiscount,
+        finalAmount: item.finalAmount,
+      };
+  
+      console.log(itemDetails);
+      const orderDetails = {
+        id: order._id,
+        paymentMethod: order.paymentMethod,
+        
+        itemDetails,
+       
+    };
+
+    console.log(orderDetails)
+  
+     
+      res.render('users/cancel-order', { orderDetails });
+    } catch (error) {
+      console.error("Error fetching order details:", error);
+      return res.json({ success: false, message: "Internal server error" });
+    }
+  };
+  
+
+
+  const cancelOrder = async (req, res) => {
+    const { itemId, reason } = req.body; // Expecting the item ID and reason from the request
+    console.log(req.body);
+  
+    try {
+      // Find the order containing the specific item in the orderedItems array
+      const order = await Order.findOne({ "orderedItems._id": itemId });
+      if (!order) {
+        return res.status(404).json({ success: false, message: "Order or item not found." });
+      }  
+  
+      // Find the specific item in the orderedItems array
+      const item = order.orderedItems.find((item) => item._id.toString() === itemId);
+      if (!item) {
+        return res.status(404).json({ success: false, message: "Item not found." });
+      }
+      item.status = "Cancel Request";
+      item.reason = reason;
+
+
+      await order.save();
+
+      console.log("Updated item status:", item);
+  
+      return res.json({ success: true, message: "Item canceled successfully" });
+    } catch (error) {
+      console.error("Error canceling order item:", error);
+      return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+  };
+  
 
 
 
-const cancelOrder = async(req,res)=>{
+
+/*const cancelOrder = async(req,res)=>{
     const { orderId,reason } = req.body;
     console.log(req.body)
 
@@ -391,9 +482,21 @@ const cancelOrder = async(req,res)=>{
       // Update order status in the database
       //const order = await Order.findByIdAndUpdate(orderId, { status: 'Cancelled' });
   
+      const order = await Order.find(
+        { 
+          canceledItems: { 
+            $elemMatch: { _id: orderId } 
+          } 
+        },
+        {
+          "canceledItems.$": 1 // Project only the matching item in orderedItems
+        }
+      );
 
+      console.log(order)
+      
 
-      const order = await Order.findOne({ _id: orderId });
+      //const order = await Order.findOne({ _id: orderId });
       if (!order) {
         return res.json({ success: false, message: "Order not found" });
       }
@@ -416,18 +519,26 @@ const cancelOrder = async(req,res)=>{
       return res.json({ success: false, message: "Internal server error" });
     }
   
-}
+}*/
 
 const getOrderReturnPage = async (req,res)=>{
-    const orderId = req.params.id;
-    console.log(orderId)
+    const itemId = req.params.id;
+    console.log(itemId)
     try {
-        const order = await Order.findOne({_id :orderId}).populate('orderedItems.book');
+        const order = await Order.findOne({ "orderedItems._id": itemId })
+        .populate('orderedItems.book');
         console.log(order)
         if(!order)
         {
             return res.status(404).json({ message: 'order not found.' });
         }
+
+        const item = order.orderedItems.find(item => item._id.toString() === itemId);
+  
+        if (!item) {
+          return res.status(404).json({ message: 'Item not found in this order.' });
+        }
+
         const orderItems = order.orderedItems.map((item) => ({
             bookName: item.bookName,
             quantity: item.quantity,
@@ -435,16 +546,24 @@ const getOrderReturnPage = async (req,res)=>{
             offerDiscount: item.offerDiscount,
         }));
 
-        const orderDetails = {
+        const itemDetails = {
+            id  : item._id,
+            bookName: item.bookName,
+            quantity: item.quantity,
+            price: item.price,
+            offerDiscount: item.offerDiscount,
+            finalAmount: item.finalAmount,
+          };
+      
+          console.log(itemDetails);
+          const orderDetails = {
             id: order._id,
             paymentMethod: order.paymentMethod,
-            totalPrice: order.totalPrice,
-            finalAmount: order.finalAmount,
-            orderItems,
-            status: order.status,
-            createdAt : order.createdAt ? order.createdAt.toISOString().split("T")[0] : null,
+            
+            itemDetails,
+           
         };
-
+    
         console.log(orderDetails)
         res.render('users/return',
             {orderDetails}
@@ -456,33 +575,30 @@ const getOrderReturnPage = async (req,res)=>{
 }
 
 const returnOrder = async(req,res)=>{
-    const { orderId,reason } = req.body;
+    const { itemId ,reason } = req.body;
     console.log(req.body)
 
     try {
-      // Update order status in the database
-      //const order = await Order.findByIdAndUpdate(orderId, { status: 'Cancelled' });
-  
+     
 
-
-      const order = await Order.findOne({ _id: orderId });
+      const order = await Order.findOne({ "orderedItems._id": itemId });
       if (!order) {
-        return res.json({ success: false, message: "Order not found" });
+        return res.status(404).json({ success: false, message: "Order or item not found." });
+      }  
+
+      const item = order.orderedItems.find((item) => item._id.toString() === itemId);
+      if (!item) {
+        return res.status(404).json({ success: false, message: "Item not found." });
       }
+      item.status = "Return Request";
+      item.reason = reason;
 
-
-      if (order.status === 'Returned') {
-        return res.json({ success: false, message: "Order has already been Returned" });
-      }
-
-
-      order.reason = reason;
-      order.status = 'Return Request';
-
-      // Save the updated order
       await order.save();
 
-      return res.json({ success: true });
+
+      console.log("Updated item status:", item);
+
+      return res.json({ success: true ,message: "Item canceled successfully" });
     } catch (error) {
       console.error("Error canceling order:", error);
       return res.json({ success: false, message: "Internal server error" });

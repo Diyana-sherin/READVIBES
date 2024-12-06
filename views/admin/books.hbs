@@ -105,8 +105,8 @@
                             <td>
                                 <i class="fa fa-edit edit-address btn edit-button" title="Edit Book"
                                     data-id="{{this._id}}" onclick="confirmEditBook('{{this._id}}')"></i>
-                                     <i class="fa fa-delete edit-address btn delete-button" title="Edit Book"
-                                    data-id="{{this._id}}" onclick="confirmEditBook('{{this._id}}')"></i>
+                                     <i class="fa fa-trash delete-icon" title="Remove Address"
+                                    onclick="confirmDeleteBook('{{this._id}}')"></i>
                             </td>
 
                         </tr>
@@ -189,6 +189,38 @@
             }
         }
 
+
+  function confirmDeleteBook(bookId) {
+            Swal.fire({
+                title: "Are you sure?",
+                text: "This action will permanently delete the Book.",
+                icon: "warning",
+                showCancelButton: true,
+                confirmButtonColor: "#d33",
+                cancelButtonColor: "#3085d6",
+                confirmButtonText: "Yes, delete it!",
+                cancelButtonText: "Cancel"
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch(`/admin/deleteBook/${bookId}`, {
+                        method: "DELETE"
+                    })
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if (data.success) {
+                                Swal.fire("Deleted!", "The Book has been deleted.", "success")
+                                    .then(() => window.location.reload());
+                            } else {
+                                Swal.fire("Error!", data.message, "error");
+                            }
+                        })
+                        .catch((error) => {
+                            Swal.fire("Error!", "An error occurred.", "error");
+                            console.error(error);
+                        });
+                }
+            });
+        }
 
 
     </script>

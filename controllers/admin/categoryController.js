@@ -133,4 +133,25 @@ const updateCategoryStatus = async (req, res) => {
     }
   };
 
-module.exports = { categoryInfo, addCategory ,loadAddCategory,getEditCategory, updateCategory,updateCategoryStatus};
+
+  const deleteCategory = async (req,res)=>{
+    try {
+        const catId = req.params.id;
+        const deletedCat = await Category.findByIdAndDelete(catId);
+
+        if (deletedCat) {
+            res.status(200).json({ success: true, message: "Category deleted successfully." });
+        } else {
+            res.status(404).json({ success: false, message: "Category not found." });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: "Internal server error." });
+    }
+}
+
+
+
+
+
+module.exports = { categoryInfo, addCategory ,loadAddCategory,getEditCategory, updateCategory,updateCategoryStatus ,deleteCategory};

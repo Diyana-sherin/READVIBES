@@ -49,42 +49,94 @@
                 <table class="table table-striped table-custom">
                     <thead>
                         <tr>
-                            <th>Book Name</th>
+                            <th>Ordered At</th>
+                            <th>User</th>
+                            <th>User Address </th>
+                            <th>Payment Methode</th>
+                            <th>Total</th>
+                            <th>ExpectedDeliveryDate</th>
+                            <th>Book Name </th>
                             <th>Category</th>
                             <th>Price</th>
                             <th> Quantity</th>
-                            <th>TotalPrice</th>
                             <th>Offer Discount</th>
                             <th>Coupon Discount</th>
-                            <th>finalAmount</th>
-                            <th>PaymentMethod</th>
-                            <th>Ordered At</th>
-                            <th>expectedDeliveryDate</th>
+                            <th>TotalPrice</th>
                             <th>Status</th>
-                            <th>cancel/return reason</th>
-                            <th>User Address</th>
+                            <th>Reason</th>
+                            <th>Final Price</th>
                             <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {{#each data}}
+                        {{#each order}}
+                        <tr>
+                            <td rowspan="{{this.orderedItems.length}}">{{this.orderedAt}}</td>
+                            <td rowspan="{{this.orderedItems.length}}"></td>
+                            <td rowspan="{{this.orderedItems.length}}">{{this.userAddress}}</td>
+                            <td rowspan="{{this.orderedItems.length}}">{{this.paymentMethod}}</td>
+                            <td rowspan="{{this.orderedItems.length}}">{{this.totalPrice}}</td>
+                            <td rowspan="{{this.orderedItems.length}}">{{this.expectedDeliveryDate}}</td>
+                            {{#if this.orderedItems.length}}
+                            <td>{{this.orderedItems.[0].bookName}}</td>
+                            <td>{{this.orderedItems.[0].category}}</td>
+                            <td>Rs {{this.orderedItems.[0].price}}</td>
+                            <td> {{this.orderedItems.[0].quantity}}</td>
+                            <td>{{this.orderedItems.[0].offerDiscount}} %</td>
+                            <td>Rs {{this.orderedItems.[0].couponDiscount}}</td>
+                            <td>Rs {{this.orderedItems.[0].finalAmount}}</td>
+                            <td>
+                                <form action="/admin/order/updateStatus/{{this.orderedItems.[0]._id}}" method="POST"
+                                    class="status-form">
+                                    <input type="hidden" value="{{this.orderedItems.[0]._id}}" name="itemId">
+                                    <select name="status" class="dropdown-status" onchange="this.form.submit()">
+                                        <option value="Pending" {{#if (eq this.status "Pending" )}}selected{{/if}}>
+                                            Pending</option>
+                                        <option value="Processing" {{#if (eq this.orderedItems.[0].status "Processing"
+                                            )}}selected{{/if}}>Processing</option>
+                                        <option value="Shipped" {{#if (eq this.orderedItems.[0].status "Shipped"
+                                            )}}selected{{/if}}>
+                                            Shipped</option>
+                                        <option value="Delivered" {{#if (eq this.orderedItems.[0].status "Delivered"
+                                            )}}selected{{/if}}>
+                                            Delivered</option>
+                                        <option value="Cancel Request" {{#if (eq
+                                            this.orderedItems.[0].status "Cancel Request" )}}selected{{/if}}>
+                                            Cancel Request</option>
+                                        <option value="Cancelled" {{#if (eq this.orderedItems.[0].status "Cancelled"
+                                            )}}selected{{/if}}>
+                                            Cancelled</option>
+                                        <option value="Return Request" {{#if (eq
+                                            this.orderedItems.[0].status "Return Request" )}}selected{{/if}}>Return
+                                            Request</option>
+                                        <option value="Returned" {{#if (eq this.orderedItems.[0].status "Returned"
+                                            )}}selected{{/if}}>
+                                            Returned</option>
+                                    </select>
+                                </form>
+                            </td>
+                            <td>{{this.orderedItems.[0].reason}}</td>
+                            {{/if}}
+                            <td rowspan="{{this.orderedItems.length}}">Rs {{this.finalAmount}}</td>
+                            <td rowspan="{{this.orderedItems.length}}">
+                                <a href="/admin/order/details/{{this.id}}" class="btn edit-button">View Details</a>
+                            </td>
+                        </tr>
+                        {{#if this.orderedItems.length}}
+                        {{#each this.orderedItems}}
+                        {{#if @index}}
                         <tr>
                             <td>{{this.bookName}}</td>
                             <td>{{this.category}}</td>
                             <td>Rs {{this.price}}</td>
                             <td> {{this.quantity}}</td>
-                            <td>Rs {{this.totalPrice}}</td>
-                            <td>{{this.offerDiscount}}%</td>
-                            <td>Rs{{this.couponDiscount}}</td>
+                            <td>{{this.offerDiscount}} %</td>
+                            <td>Rs {{this.couponDiscount}}</td>
                             <td>Rs {{this.finalAmount}}</td>
-                            <td>{{this.paymentMethod}}</td>
-                            <td>{{this.orderedAt}}</td>
-                            <td>{{this.expectedDeliveryDate}}</td>
-
-
-
                             <td>
-                                <form action="/admin/order/updateStatus/{{this.id}}" method="POST" class="status-form">
+                                  <form action="/admin/order/updateStatus/{{this._id}}" method="POST"
+                                    class="status-form">
+                                  <input type="hidden" value="{{this._id}}" name="itemId">
                                     <select name="status" class="dropdown-status" onchange="this.form.submit()">
                                         <option value="Pending" {{#if (eq this.status "Pending" )}}selected{{/if}}>
                                             Pending</option>
@@ -94,26 +146,22 @@
                                             Shipped</option>
                                         <option value="Delivered" {{#if (eq this.status "Delivered" )}}selected{{/if}}>
                                             Delivered</option>
-                                        <option value="Cancel Request" {{#if (eq this.status  "Cancel Request" )}}selected{{/if}}>
+                                        <option value="Cancel Request" {{#if (eq this.status "Cancel Request" )}}selected{{/if}}>
                                             Cancel Request</option>
-                                        <option value="Cancelled" {{#if (eq this.status "Cancelled"
-                                            )}}selected{{/if}}>
+                                        <option value="Cancelled" {{#if (eq this.status "Cancelled" )}}selected{{/if}}>
                                             Cancelled</option>
-
                                         <option value="Return Request" {{#if (eq this.status "Return Request"
                                             )}}selected{{/if}}>Return Request</option>
                                         <option value="Returned" {{#if (eq this.status "Returned" )}}selected{{/if}}>
                                             Returned</option>
                                     </select>
                                 </form>
-
                             </td>
                             <td>{{this.reason}}</td>
-                            <td>{{this.userAddress}}</td>
-                            <td>
-                                <a href="/admin/order/details/{{this.id}}" class="btn edit-button">View Details</a>
-                            </td>
                         </tr>
+                        {{/if}}
+                        {{/each}}
+                        {{/if}}
                         {{/each}}
                     </tbody>
                 </table>

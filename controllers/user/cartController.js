@@ -193,7 +193,10 @@ const loadCart = async (req, res) => {
 
 
 
-        res.render('users/cart', { cartItems, subtotal, checkout });
+        res.render('users/cart', { cartItems, subtotal, checkout, breadcrumbs: [
+            { name: "Home", url: "/homelog" },
+            { name: "cart", url: "/cart" }
+        ] });
 
 
     } catch (error) {

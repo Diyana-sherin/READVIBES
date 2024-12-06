@@ -27,7 +27,15 @@ router.get('/logout',userController.logout)
 //sigle signup
 router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/signup' }), (req, res) => {
+    req.session.user = req.user._id;
+    console.log(req.user)
     res.redirect('/homelog');
+});
+
+// Handle signup error for duplicate emails
+router.get('/signup', (req, res) => {
+    const error = req.query.error;
+    res.render('users/signup', { error: error || null }); // Pass error to the signup page
 });
 
 //forget password
@@ -70,7 +78,7 @@ router.post('/addAddress/:id',userAuth,checkoutController.addAddress)
 router.delete('/address/delete/:id',userAuth,checkoutController.deleteAddress)
 
 router.post('/place-order',userAuth,checkoutController.placeOrder)
-router.get('/orderSuccess',userAuth,checkoutController.orderSuccessPage)
+router.get('/orderSuccess/:id',userAuth,checkoutController.orderSuccessPage)
 
 router.post('/validate-cash-on-delivery',userAuth,checkoutController.validateCOD)
 router.post('/validate-wallet',userAuth,walletController.validateWallet)
@@ -114,6 +122,11 @@ router.post('/verify-WalletPayment',walletController.verifyPayment)
 
 router.get('/filter-orders',profileController.filterOrders)
 
+router.post('/download-invoice',checkoutController.download)
 
-router.post('/filterBooks',userController.filterBooks)
+router.post('/retryPayment',checkoutController.retryPayment)
+
+
+
+
 module.exports = router;

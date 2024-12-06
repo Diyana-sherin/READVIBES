@@ -31,6 +31,9 @@ router.get('/logout',adminController.logout)
 
 //router.get('/api/sales-data',adminController.takeData)
 router.post('/generate-sales-report', adminController.generateSalesReport);
+router.post('/filter',adminController.salesChart)
+router.get('/top-products',adminController.topTenProducts)
+router.get('/top-categories',adminController.topCategories)
 
 //users
 router.get('/users',adminAuth,customerController.userInfo);
@@ -45,6 +48,7 @@ router.post('/addCategory',adminAuth,categoryController.addCategory)
 router.get('/editCategory/:id',adminAuth, categoryController.getEditCategory);
 router.post('/editCategory/:id', adminAuth,categoryController.updateCategory);
 router.post('/category/updateStatus/:id',adminAuth, categoryController.updateCategoryStatus);
+router.delete('/deleteCat/:id', categoryController.deleteCategory);
 
 
 //books
@@ -59,6 +63,8 @@ router.post('/book/updateStockStatus/:id',adminAuth,productController.updateStat
 
 //router.put('/book/updateStatus/:id', productController.updateBookStatus);
 router.post('/book/updateStatus/:id',adminAuth, productController.updateBookStatus);
+router.delete('/deleteBook/:id', productController.deleteBook);
+
 
 //orders
 router.get('/orders',adminAuth,orderController.loadOrderPage)

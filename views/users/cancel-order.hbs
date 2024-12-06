@@ -24,20 +24,20 @@
     <!-- Order Summary Section -->
     <div class="card p-4">
       <h3 class="mb-4">Order Summary</h3>
-      <input type="hidden" value="{{orderDetails.id}}" id="orderId">
+      <input type="hidden" value="{{orderDetails.itemDetails.id}}" id="itemId">
       <p><strong>Order ID:</strong> {{orderDetails.id}}</p>
       <p>Total Price: Rs {{orderDetails.totalPrice}}</p>
       <p>Final Amount: Rs {{orderDetails.finalAmount}}</p>
       <p>Status: {{orderDetails.status}}</p>
       <ul>
-        {{#each orderDetails.orderItems}}
+      
         <li>
-          <strong>Book Name:</strong> {{bookName}}<br>
-          <strong>Quantity:</strong> {{quantity}}<br>
-          <strong>Price:</strong> Rs {{price}}<br>
-          <strong>Offer Discount:</strong> {{offerDiscount}}%
+          <strong>Book Name:</strong> {{orderDetails.itemDetails.bookName}}<br>
+          <strong>Quantity:</strong> {{orderDetails.itemDetails.quantity}}<br>
+          <strong>Price:</strong> Rs {{orderDetails.itemDetails.price}}<br>
+          <strong>Offer Discount:</strong> {{orderDetails.itemDetails.offerDiscount}}%
         </li>
-        {{/each}}
+     
       </ul>
       <p><strong>Order Date:</strong> {{createdAt}}</p>
       <p><strong>Payment Method:</strong> {{orderDetails.paymentMethod}}</p>
@@ -70,7 +70,7 @@
   document.getElementById("cancelOrderBtn").addEventListener("click", async function (event) {
     event.preventDefault(); // Prevent the form from submitting and reloading the page
     
-    const orderId = document.getElementById('orderId').value;
+    const itemId = document.getElementById('itemId').value;
     const reason = document.getElementById('cancellationReason').value;
     
     if (!reason) {
@@ -84,7 +84,7 @@
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ orderId, reason })
+        body: JSON.stringify({ itemId, reason })
       });
 
       const result = await response.json();
@@ -100,6 +100,7 @@
         });
       } else {
         alert("Failed to cancel the order. Please try again.");
+        console.log(result.message)
       }
     } catch (error) {
       console.error("Error canceling order:", error);

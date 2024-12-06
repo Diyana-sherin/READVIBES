@@ -140,6 +140,21 @@
 
 <body>
     {{> user/header}}
+
+ <div class="container">
+ <div class="my-4">
+  <ol class="breadcrumb" style="background-color: transparent; font-size: 0.9rem; font-family: 'Poppins', sans-serif; color: #6c757d;">
+    {{#each breadcrumbs}}
+      {{#if url}}
+        <li class="breadcrumb-item"><a href="{{url}}" style="color: #6c757d; text-decoration: none;">{{name}}</a></li>
+      {{else}}
+        <li class="breadcrumb-item active" aria-current="page" style="color: #6c757d;">{{name}}</li>
+      {{/if}}
+    {{/each}}
+  </ol>
+</div>
+ </div>
+
     <div class="wishlist-container">
         <div class="wishlist-items">
             {{#if wishlistItems.length}}

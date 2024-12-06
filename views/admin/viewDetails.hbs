@@ -32,7 +32,7 @@
             <div class="col-md-4">
                 <p><strong>Payment</strong></p>
                 <p>{{order.paymentMethod}}<br>
-                    Coupon Discount :{{order.couponDiscount}} <br>
+                
                     Shipping fee: Free<br>
                     Total paid: Rs{{order.finalAmount}}</p>
             </div>
@@ -46,8 +46,10 @@
                     <img src="/uploads/product-images/{{item.productImage}}" alt="Item Image" width="50" height="50"> {{this.name}}<br>
                    <p>Quantity: {{item.quantity}}</p>
                     <p>Price: Rs {{item.price}}</p>
-                     <p>offerDiscount:  {{item.offerDiscount}}%</p>
-                      <p>OfferPrice: Rs {{item.offerPrice}}</p>
+                     <p>offerDiscount:  {{item.perOfferDiscount}}%</p>
+                      <p>OfferPrice: Rs {{item.offerDiscount}}</p>
+                        <p>  Coupon Discount : Rs {{item.couponDiscount}}</p>
+                         <p>  finalAmount : Rs {{item.finalAmount}}</p>
                 </p>
             </div>
            {{/each}}

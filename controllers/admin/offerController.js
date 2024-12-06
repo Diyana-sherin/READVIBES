@@ -64,21 +64,18 @@ const addOffers = async (req, res) => {
         console.log(req.body)
 
         
-        const offerExistsForBook = await Offer.findOne({
-            offerName: new RegExp(`^${offerName}$`, 'i'), //  offerName
-           bookName: new RegExp(`^${bookName}$`, 'i'),   //  bookName
-        });
+        const offerExistsForBook = await Offer.findOne({bookName:bookName});
 
-       const offerExistsForCategory = await Offer.findOne({
-            offerName: new RegExp(`^${offerName}$`, 'i'), //  offerName
-            category: new RegExp(`^${category}$`, 'i'),   //  category
-        });
+       const offerExistsForCategory = await Offer.findOne({category:category});
 
         const categories = await Category.find({ status: "listed" })
         const book = await Books.find({isBlocked:false})
 
-        if (offerExistsForBook  && offerExistsForCategory) {
-            return res.render('admin/addOffers', {book,categories, message: "Offer already exists for this book or category" });
+        if (offerExistsForBook ) {
+            return res.render('admin/addOffers', {book,categories, message: "Offer already exists for this book " });
+        }
+        if ( offerExistsForCategory) {
+            return res.render('admin/addOffers', {book,categories, message: "Offer already exists for this category " });
         }
 
         const newOffer = new Offer({

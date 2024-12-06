@@ -40,23 +40,36 @@ const orderSchema = new Schema({
         offerDiscount : {
             type:Number,
             default:0
+        },
+        couponDiscount:{
+            type:Number,
+            default:0
+        },
+        reason:{
+            type:String,
+        },
+        status:{
+            type:String,
+            required:true,
+            enum:['Pending','Processing','Shipped','Delivered','Cancel Request','Cancelled','Return Request','Returned']
+        },
+        finalAmount:{
+            type:Number,
+            required:true
         }
-
     }],
     totalPrice:{
         type:Number,
         required:true
     },
-    couponDiscount:{
+   /* couponDiscount:{
         type:Number,
         default:0
-    },
-    perCouponDiscount:{
-        type:Number,
-        default:0
-    },
-    
-   
+    }*/
+        deliveryCharge : {
+            type:Number,
+            default : 0,
+        },
     finalAmount:{
         type:Number,
         required:true
@@ -97,14 +110,6 @@ const orderSchema = new Schema({
     invoiceDate:{
         type:Date
     },
-    status:{
-        type:String,
-        required:true,
-        enum:['Pending','Processing','Shipped','Delivered','Cancel Request','Cancelled','Return Request','Returned']
-    },
-    reason:{
-        type:String,
-    },
     razorpayOrderId: {  
         type: String,
         default: null
@@ -113,9 +118,12 @@ const orderSchema = new Schema({
         type:String,
         required:true,
     },
+    paymentStatus :{
+        type:String,
+    },
     expectedDeliveryDate: {
         type: Date,
-       
+        
       },
 },{timestamps : true});
 

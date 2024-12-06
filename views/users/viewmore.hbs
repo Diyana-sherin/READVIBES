@@ -274,7 +274,26 @@
           </select>
         </div>
 
-        <!-- Filter Section -->
+<div class="mb-3">
+  <label class="fw-semibold" style="font-size: 0.95rem; color: #343a40;">Filter by Category:</label>
+  <div id="categoryRadioButtons">
+    <div class="form-check">
+      <input class="form-check-input" type="radio" name="category" id="categoryAll" value="All" 
+        {{#if (eq selectedCategory "All")}}checked{{/if}}>
+      <label class="form-check-label" for="categoryAll">All Categories</label>
+    </div>
+    {{#each categories}}
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="category" id="category{{name}}" value="{{name}}" 
+          {{#if (eq ../selectedCategory name)}}checked{{/if}}>
+        <label class="form-check-label" for="category{{name}}">{{name}}</label>
+      </div>
+    {{/each}}
+  </div>
+</div>
+
+
+        <!-- Filter Section 
         <div class="filter-section mt-4">
           <h5>Filter by Category</h5>
           {{#each categories}}
@@ -283,9 +302,12 @@
               this._id)}}checked{{/if}}> {{this.name}}
           </label>
           {{/each}}
-        </div>
+        </div>-->
+
+
       </div>
 
+      
       <!-- Book Collection -->
       <div class="col-md-10">
         <div class="container my-4">
@@ -338,265 +360,117 @@
 
   {{> user/footer}}
 
-  <!-- Scripts -->
-  <script>
-    // Sort Functionality
-    document.getElementById('sortDropdown').addEventListener('change', function () {
-      const selectedSort = this.value;
-      const currentUrl = new URL(window.location.href);
-      currentUrl.searchParams.set('sort', selectedSort);
-      window.location.href = currentUrl.toString();
+
+ 
+   <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const sortDropdown = document.getElementById('sortDropdown');
+    const categoryRadioButtons = document.getElementsByName('category');
+
+    // Helper to get the selected category
+    const getSelectedCategory = () => {
+      for (let radio of categoryRadioButtons) {
+        if (radio.checked) {
+          return radio.value;
+        }
+      }
+      return 'All';
+    };
+
+    // Apply filters on sort or category change
+    const applyFilters = () => {
+      const sortOption = sortDropdown.value;
+      const selectedCategory = getSelectedCategory();
+      const searchQuery = new URLSearchParams(window.location.search).get('search') || '';
+
+      // Construct the new query string
+      const queryParams = new URLSearchParams({
+        sort: sortOption,
+        category: selectedCategory,
+        search: searchQuery,
+      });
+
+      // Redirect to the updated URL
+      window.location.href = `/viewmore?${queryParams.toString()}`;
+    };
+
+    // Event listener for sort dropdown
+    sortDropdown.addEventListener('change', applyFilters);
+
+    // Event listeners for category radio buttons
+    categoryRadioButtons.forEach(radio => {
+      radio.addEventListener('change', applyFilters);
     });
+  });
+</script>
 
-    // Filter Functionality
-    document.querySelectorAll('input[name="category"]').forEach(radio => {
-      radio.addEventListener('change', function () {
-        const selectedCategory = this.value;
-        fetch('/filterBooks', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ category: selectedCategory }),
-        })
-          .then(res => res.json())
-          .then(data => {
-            if (data.success) {
-              updateBookDisplay(data.books);
-            } else {
-              console.error('Failed to filter books');
-            }
-          })
-          .catch(err => console.error('Error:', err));
-      });
-    });
-
-    /* function updateBookDisplay(books) {
-       const bookContainer = document.querySelector('.books-container');
-       bookContainer.innerHTML = '';
- 
-       books.forEach(book => {
-         const bookCard = `
-           <div class="col-md-3 col-sm-6 mb-4">
-             <div class="card grey-theme-card">
-               <a href="/bookDetails/${book._id}">
-                 <img src="/uploads/product-images/${book.productImage[0]}" alt="${book.bookName}"
-                   class="card-img-top" style="height: 200px; object-fit: cover;">
-               </a>
-               <div class="card-body">
-                 <h5 class="card-title">${book.bookName}</h5>
-                 <p class="card-text author-name">by ${book.authorName}</p>
-                 <div class="price-section">
-                   <span class="original-price">₹${book.regularPrice}</span>
-                   <span class="sales-price">₹${book.salePrice}</span>
-                 </div>
-                 <div class="rating">
-                   <span>⭐⭐⭐⭐⭐</span>
-                 </div>
-                 <div class="icon-section d-flex justify-content-between mt-3">
-                   <a href="#" data-id="${book._id}" class="add-to-wishlist"><i class="fa fa-heart wishlist-icon"></i></a>
-                   <a href="#" data-id="${book._id}" class="add-to-cart"><i class="fa fa-shopping-cart cart-icon"></i></a>
-                 </div>
-               </div>
-             </div>
-           </div>
-         `;
-         bookContainer.insertAdjacentHTML('beforeend', bookCard);
-       });
- 
-       attachEventListeners();
-     }
- 
-     function attachEventListeners() {
-       document.querySelectorAll('.add-to-cart').forEach(item => {
-         item.addEventListener('click', function (event) {
-           event.preventDefault();
-           const bookId = this.getAttribute('data-id');
-           fetch(`/addToCart/${bookId}`, { method: 'POST' })
-            then(res => res.json())
-           .then(data => {
-             Swal.fire({
-               toast: true,
-               position: 'top-end',
-               icon: 'success',
-               title: data.message,
-               showConfirmButton: false,
-               timer: 1500,
-               timerProgressBar: true,
-             });
-           })
-           .catch(error => {
-             console.log("Error:", error);
-             Swal.fire({
-               icon: 'error',
-               title: 'Oops...',
-               text: 'Something went wrong! Please try again later.',
-             });
-         });
-       });
- 
-       document.querySelectorAll('.add-to-wishlist').forEach(item => {
-         item.addEventListener('click', function (event) {
-           event.preventDefault();
-           const bookId = this.getAttribute('data-id');
-           fetch(`/addToWishlist/${bookId}`, { method: 'POST' })
-             .then(res => res.json())
-             .then(data => alert(data.message))
-             .catch(err => console.error('Error:', err));
-         });
-       });
-     }
- 
-     // Initial Event Listeners
-     attachEventListeners();*/
-
-
-
-    function attachEventListeners() {
-      // Add to Cart
-      document.querySelectorAll('.add-to-cart').forEach(item => {
-        item.addEventListener('click', function (event) {
-          event.preventDefault();
-          const bookId = this.getAttribute('data-id');
-
-          fetch(`/addToCart/${bookId}`, { method: 'POST' })
-            .then(res => res.json())
-            .then(data => {
-              if (data.success) {
-                Swal.fire({
-                  toast: true,
-                  position: 'top-end',
-                  icon: 'success',
-                  title: data.message,
-                  showConfirmButton: false,
-                  timer: 1500,
-                  timerProgressBar: true,
+<script>
+            document.querySelectorAll(".add-to-cart").forEach(item => {
+                item.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    const bookId = this.getAttribute('data-id');
+                    fetch(`/addToCart/${bookId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: data.message,
+                                showConfirmButton: false,
+                                timer: 1500,
+                                timerProgressBar: true,
+                            });
+                        })
+                        .catch(error => {
+                            console.log("Error:", error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Something went wrong! Please try again later.',
+                            });
+                        });
                 });
-              } else {
-                Swal.fire({
-                  position: 'top-end',
-                  icon: 'error',
-                  title: data.message || 'Failed to add to cart.',
-                  showConfirmButton: false,
-                  timer: 1500,
-                  toast: true
-                });
-              }
-            })
-            .catch(err => {
-              Swal.fire({
-                position: 'top-end',
-                icon: 'error',
-                title: 'An error occurred!',
-                showConfirmButton: false,
-                timer: 1500,
-                toast: true
-              });
-              console.error('Error:', err);
             });
-        });
-      });
 
-      // Add to Wishlist
-      document.querySelectorAll('.add-to-wishlist').forEach(item => {
-        item.addEventListener('click', function (event) {
-          event.preventDefault();
-          const bookId = this.getAttribute('data-id');
-
-          fetch(`/addWishlist/${bookId}`, { method: 'POST' })
-            .then(res => res.json())
-            .then(data => {
-              if (data.success) {
-                Swal.fire({
-                  toast: true,
-                  position: 'top-end',
-                  icon: 'success',
-                  title: data.message,
-                  showConfirmButton: false,
-                  timer: 1500,
-                  timerProgressBar: true,
+            document.querySelectorAll(".add-to-wishlist").forEach(item => {
+                item.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    const bookId = this.getAttribute('data-id');
+                    fetch(`/addWishlist/${bookId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                        .then(res => res.json())
+                        .then(data => {
+                            Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'success',
+                                title: data.message,
+                                showConfirmButton: false,
+                                timer: 1500,
+                                timerProgressBar: true,
+                            });
+                        })
+                        .catch(error => {
+                            console.log("Error:", error);
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Oops...',
+                                text: 'Something went wrong! Please try again later.',
+                            });
+                        });
                 });
-              } else {
-                Swal.fire({
-                  position: 'top-end',
-                  icon: 'error',
-                  title: data.message || 'Failed to add to wishlist.',
-                  showConfirmButton: false,
-                  timer: 1500,
-                  toast: true
-                });
-              }
-            })
-            .catch(err => {
-              Swal.fire({
-                position: 'top-end',
-                icon: 'error',
-                title: 'An error occurred!',
-                showConfirmButton: false,
-                timer: 1500,
-                toast: true
-              });
-              console.error('Error:', err);
             });
-        });
-      });
-    }
-
-    // Reattach event listeners on updated book display
-    function updateBookDisplay(books) {
-      const bookContainer = document.querySelector('.books-container');
-      bookContainer.innerHTML = '';
-
-
-      books.forEach(book => {
-
-        const priceSection = book.offerName
-          ? `
-        <div>
-          <span class="original-price" style="text-decoration: line-through; color: grey;">₹${book.salePrice}</span>
-          <span class="sales-price" style="color: #388e3c;">₹${book.offerPrice}</span>
-        </div>
-        <span style="color: #388e3c;">${book.discount}% off</span>
-      `
-          : `
-        <span class="sales-price" style="color: #000;">₹${book.salePrice}</span>
-      `;
-
-
-        const bookCard = `
-      <div class="col-md-3 col-sm-6 mb-4">
-        <div class="card grey-theme-card">
-          <a href="/bookDetails/${book._id}">
-            <img src="/uploads/product-images/${book.productImage[0]}" alt="${book.bookName}"
-              class="card-img-top" style="height: 200px; object-fit: cover;">
-          </a>
-          <div class="card-body">
-            <h5 class="card-title">${book.bookName}</h5>
-            <p class="card-text author-name">by ${book.authorName}</p>
-            <div class="price-section">
-              ${priceSection}
-            </div>
-            <div class="rating">
-              <span>⭐⭐⭐⭐⭐</span>
-            </div>
-            <div class="icon-section d-flex justify-content-between mt-3">
-              <a href="#" data-id="${book._id}" class="add-to-wishlist"><i class="fa fa-heart wishlist-icon"></i></a>
-              <a href="#" data-id="${book._id}" class="add-to-cart"><i class="fa fa-shopping-cart cart-icon"></i></a>
-            </div>
-          </div>
-        </div>
-      </div>
-    `;
-        bookContainer.insertAdjacentHTML('beforeend', bookCard);
-      });
-
-      attachEventListeners(); // Reattach event listeners after updating books
-    }
-
-    // Initial event listener setup
-    attachEventListeners();
-
-  </script>
+        </script>
 
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

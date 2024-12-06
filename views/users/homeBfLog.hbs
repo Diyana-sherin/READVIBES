@@ -165,6 +165,114 @@
     .logo {
       font-weight: 700;
     }
+
+     .container-fluid {
+      background-color: #f8f9fa;
+      padding: 20px;
+    }
+
+    .grey-theme-card {
+      background-color: #e0e0e0;
+      border: none;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: bold;
+      color: #333;
+    }
+
+    .author-name {
+      color: #666;
+      font-size: 0.9rem;
+      margin-bottom: 10px;
+    }
+
+    .price-section {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 5px;
+    }
+
+    .original-price {
+      text-decoration: line-through;
+      color: #888;
+    }
+
+    .sales-price {
+      font-weight: bold;
+      color: #d9534f;
+    }
+
+    .rating {
+      color: #f0ad4e;
+      font-size: 1rem;
+      margin-top: 5px;
+    }
+
+    .icon-section i {
+      font-size: 1.2rem;
+      cursor: pointer;
+      color: #555;
+    }
+
+    .icon-section i:hover {
+      color: #333;
+    }
+
+    .view-more-btn {
+      font-weight: bold;
+      color: #000000;
+      border-color: #bc6666;
+      border-radius: 1.5rem;
+    }
+
+    .view-more-btn:hover {
+      background-color: #b37575;
+      color: #000000;
+    }
+    .feature-section {
+      background-color: #f8f9fa;
+      padding: 40px ;
+      margin-bottom: 30px;
+    }
+    .feature-item {
+      text-align: center;
+      transition: transform 0.3s ease;
+    }
+    .feature-item:hover {
+      transform: translateY(-10px);
+    }
+    .feature-item .icon-circle {
+      background-color: #333;
+      color: #fff;
+      border-radius: 50%;
+      padding: 10px;
+      margin: 0 auto 15px auto; /* Center align */
+      font-size: 1.5rem;
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    .feature-item .icon-circle:hover {
+      background-color: #6d7072;
+      color: #fff;
+    }
+    .feature-item h5 {
+      font-weight: bold;
+      margin-bottom: 5px;
+      font-size: 1.1rem;
+    }
+    .feature-item p {
+      color: #777;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 
@@ -274,8 +382,18 @@
             <h5 class="card-title">{{this.bookName}}</h5>
             <p class="card-text author-name">by {{this.authorName}}</p>
             <div class="price-section">
-              <span class="original-price">₹{{this.regularPrice}}</span>
+                {{#if this.offerName}}
+               <div>
+              <span class="original-price">₹{{this.salePrice}}</span>
+              
+              <span class="sales-price" style=" color: #388e3c;">₹{{this.offerPrice}}</span>
+               </div>
+                <span  style=" color: #388e3c;" >{{this.discount}}% off </span>
+              {{else}}
+              
               <span class="sales-price">₹{{this.salePrice}}</span>
+              {{/if}}
+             
             </div>
             <div class="rating">
               <span>⭐⭐⭐⭐⭐</span> <!-- Dummy content for rating -->
@@ -310,8 +428,18 @@
             <h5 class="card-title">{{this.bookName}}</h5>
             <p class="card-text author-name">by {{this.authorName}}</p>
             <div class="price-section">
-              <span class="original-price">₹{{this.regularPrice}}</span>
+              {{#if this.offerName}}
+               <div>
+              <span class="original-price">₹{{this.salePrice}}</span>
+              
+              <span class="sales-price" style=" color: #388e3c;">₹{{this.offerPrice}}</span>
+               </div>
+                <span  style=" color: #388e3c;" >{{this.discount}}% off </span>
+              {{else}}
+              
               <span class="sales-price">₹{{this.salePrice}}</span>
+              {{/if}}
+             
             </div>
             <div class="rating">
               <span>⭐⭐⭐⭐⭐</span> <!-- Dummy content for rating -->

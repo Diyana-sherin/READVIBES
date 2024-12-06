@@ -124,7 +124,11 @@ const loadWishlist = async (req, res) => {
         if (!wishlist || !wishlist.items.length === 0) {
             return res.render('users/wishlist', {
                 wishlistItems: [],
-                messege: 'Your Wishlist is empty'
+                messege: 'Your Wishlist is empty',
+                breadcrumbs: [
+                    { name: "Home", url: "/homelog" },
+                    { name: "wishlist", url: "/wishlist" }
+                ]
             });
         }
        
@@ -222,7 +226,10 @@ const loadWishlist = async (req, res) => {
 
 
 
-        res.render('users/wishlist', { wishlistItems, });
+        res.render('users/wishlist', { wishlistItems,  breadcrumbs: [
+            { name: "Home", url: "/homelog" },
+            { name: "wishlist", url: "/wishlist" }
+        ]});
 
 
     } catch (error) {

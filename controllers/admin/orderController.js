@@ -44,31 +44,61 @@ const loadOrderPage = async (req, res) => {
             ]
         });
 
+        /* const formatOrder = (order) => ({
+             id: order._id,
+             bookName: order.orderedItems.map(item => item.bookName).join(','),
+             category: order.orderedItems.map(item => item.book?.category?.name).join(','),
+             price: order.orderedItems.map(item => item.price).join(', '),
+             quantity: order.orderedItems.map(item => item.quantity ?? 1).join(', '),
+             totalPrice: order.totalPrice,
+             finalAmount: order.finalAmount,
+             offerDiscount: order.orderedItems.map(item => item.perOfferDiscount ?? 1).join(', '),
+             couponDiscount: order.couponDiscount.toFixed(2),
+             orderedAt: order.createdAt ? order.createdAt.toISOString().split("T")[0] : null,
+             status: order.status,
+             paymentMethod : order.paymentMethod,
+             reason : order.reason,
+             expectedDeliveryDate : order.expectedDeliveryDate ? order.expectedDeliveryDate.toISOString().split("T")[0] : null,
+             userAddress: `${order.orderAddress[0].name},${order.orderAddress[0].houseName},${order.orderAddress[0].city},
+             ${order.orderAddress[0].landMark},${order.orderAddress[0].state},${order.orderAddress[0].pincode},
+             ${order.orderAddress[0].phone},${order.orderAddress[0].altPhone}`,
+         });
+ 
+         const orders = orderData.map(formatOrder)
+     */
+
         const formatOrder = (order) => ({
             id: order._id,
-            bookName: order.orderedItems.map(item => item.bookName).join(','),
-            category: order.orderedItems.map(item => item.book?.category?.name).join(','),
-            price: order.orderedItems.map(item => item.price).join(', '),
-            quantity: order.orderedItems.map(item => item.quantity ?? 1).join(', '),
+            orderedItems: order.orderedItems.map(item => ({
+                _id: item._id,                            
+                bookName: item.bookName,
+                category: item.book?.category?.name,
+                price: item.price,
+                quantity: item.quantity ?? 1,
+                offerDiscount: item.perOfferDiscount ?? 0,
+                couponDiscount: item.couponDiscount.toFixed(2),
+                status:item.status,
+                reason: item.reason,
+                finalAmount : item.finalAmount,
+            })),
             totalPrice: order.totalPrice,
             finalAmount: order.finalAmount,
-            offerDiscount: order.orderedItems.map(item => item.perOfferDiscount ?? 1).join(', '),
-            couponDiscount: order.couponDiscount.toFixed(2),
             orderedAt: order.createdAt ? order.createdAt.toISOString().split("T")[0] : null,
-            status: order.status,
-            paymentMethod : order.paymentMethod,
-            reason : order.reason,
-            expectedDeliveryDate : order.expectedDeliveryDate ? order.expectedDeliveryDate.toISOString().split("T")[0] : null,
+            paymentMethod: order.paymentMethod,
+            expectedDeliveryDate: order.expectedDeliveryDate ? order.expectedDeliveryDate.toISOString().split("T")[0] : null,
             userAddress: `${order.orderAddress[0].name},${order.orderAddress[0].houseName},${order.orderAddress[0].city},
-            ${order.orderAddress[0].landMark},${order.orderAddress[0].state},${order.orderAddress[0].pincode},
-            ${order.orderAddress[0].phone},${order.orderAddress[0].altPhone}`,
+    ${order.orderAddress[0].landMark},${order.orderAddress[0].state},${order.orderAddress[0].pincode},
+    ${order.orderAddress[0].phone},${order.orderAddress[0].altPhone}`,
         });
 
-        const orders = orderData.map(formatOrder)
 
-       
+        const orders = orderData.map(formatOrder)
+        orders.forEach(order => {
+           // console.log("Ordered Items:", order.orderedItems);
+        });
+
         res.render('admin/orders', {
-            data: orders,
+            order:orders,
             currentPage: page,
             totalPages: Math.ceil(count / limit),
             search
@@ -85,7 +115,7 @@ const loadOrderPage = async (req, res) => {
 
 
 
-       
+
 
 
 
@@ -95,38 +125,44 @@ const loadOrderPage = async (req, res) => {
 
 const chengeStatus = async (req, res) => {
     try {
-        const { orderId } = req.params;
+        const { itemId } = req.body;
         const { status } = req.body;
-
+        console.log(itemId,status)
         const validStatuses = [
-            'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancel Request','Cancelled', 'Return Request', 'Returned'
+            'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancel Request', 'Cancelled', 'Return Request', 'Returned'
         ];
         if (!validStatuses.includes(status)) {
             return res.status(400).send('Invalid status.');
         }
 
-        const order = await Order.findById(orderId)
-        const userId = order.userId;
-        
-        const bookName = order.orderedItems.map(item => item.bookName);
-        console.log(bookName)
-
-
+        const order = await Order.findOne({ "orderedItems._id": itemId });
+        //console.log(order)
         if (!order) {
-            return res.status(404).send('Order not found.');
-        }
+            return res.status(404).json({ success: false, message: "Order or item not found." });
+          }
+      
 
-        // Update the status
-        order.status = status;
+        const userId = order.userId;
 
-        // Check if the order is being canceled
-        if (status === 'Cancelled') {
-            // Check if the payment method is online
-            if (order.paymentMethod === 'online') {
-                // Find the user's wallet
+       
+        const item = order.orderedItems.find((item) => item._id.toString() === itemId);
+        if (!item) {
+            return res.status(404).json({ success: false, message: "Item not found." });
+          }
+          item.status = status;
+
+          await order.save();
+        
+
+       
+       
+        if (status === 'Cancelled' || status === 'Returned') {
+            
+            if (order.paymentMethod === 'online' || order.paymentMethod === 'wallet' ) {
+                
                 let wallet = await Wallet.findOne({ userId: order.userId });
 
-                // If wallet doesn't exist, create one
+             
                 if (!wallet) {
                     wallet = new Wallet({
                         userId: order.userId,
@@ -134,30 +170,28 @@ const chengeStatus = async (req, res) => {
                         transactions: [],
                     });
                     await wallet.save();
-                    await User.findByIdAndUpdate(userId, { $push: { wallet : wallet._id } });
+                    await User.findByIdAndUpdate(userId, { $push: { wallet: wallet._id } });
                     console.log('Created and added wallet reference to user');
                 }
                 console.log(wallet)
 
-                // Add the refund amount to the wallet
-                wallet.balance += order.finalAmount;
+                wallet.balance += item.finalAmount;
 
-                // Add a transaction entry in the wallet
+                
                 wallet.transactions.push({
                     date: new Date(),
                     type: 'credit',
-                    amount: order.finalAmount,
-                    description: `Refund for Order of  ${bookName}`,
+                    amount: item.finalAmount,
+                    description: `Refund for Order of  ${item.bookName}`,
                 });
 
-                // Save the updated wallet
+                
                 await wallet.save();
                 console.log(wallet)
             }
         }
-
-        // Save the updated order
-        await order.save();
+console.log(item)
+      
 
         res.redirect('/admin/orders');
     } catch (error) {
@@ -172,7 +206,7 @@ const ViewOrderDetails = async (req, res) => {
     try {
 
         const orderId = req.params.id;
-       // console.log("Order ID:", orderId);
+        console.log("Order ID:", orderId);
 
         // Fetch order data
         const orderData = await Order.findOne({ _id: orderId })
@@ -184,7 +218,7 @@ const ViewOrderDetails = async (req, res) => {
                 path: 'userId',
                 select: 'name email phone'
             })
-           
+
 
         const formatOrder = (order) => ({
             id: order._id,
@@ -194,16 +228,17 @@ const ViewOrderDetails = async (req, res) => {
                 quantity: item.quantity,
                 price: item.price,
                 offerDiscount: item.offerDiscount,
-                offerPrice: item.price * ((100 - item.offerDiscount) / 100),
+                couponDiscount: item.couponDiscount.toFixed(2),
+                perOfferDiscount : item.perOfferDiscount,
+                  status:item.status,
                 productImage: item.book.productImage[0],
+                finalAmount : item.finalAmount,
             })),
             finalAmount: order.finalAmount,
             totalPrice: order.totalPrice,
             paymentMethod: order.paymentMethod,
             offerDiscount: order.orderedItems.map(item => item.offerDiscount ?? 1).join(', '),
-            couponDiscount: order.cuoponDiscount,
             orderedAt: order.createdAt ? order.createdAt.toISOString().split("T")[0] : null,
-            status: order.status,
             userAddress: `${order.orderAddress[0].name},${order.orderAddress[0].houseName},${order.orderAddress[0].city},
             ${order.orderAddress[0].landMark},${order.orderAddress[0].state},${order.orderAddress[0].pincode},
             ${order.orderAddress[0].phone},${order.orderAddress[0].altPhone}`,
@@ -215,10 +250,10 @@ const ViewOrderDetails = async (req, res) => {
 
         const formattedOrder = formatOrder(orderData);
 
-       // console.log(formattedOrder)
+        // console.log(formattedOrder)
 
 
-       // console.log("Order Data:", orderData.userId);
+        // console.log("Order Data:", orderData.userId);
 
         res.render('admin/viewDetails', { order: formattedOrder });
     } catch (error) {

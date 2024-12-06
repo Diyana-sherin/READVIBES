@@ -23,21 +23,12 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .order-section {
-            margin-bottom: 20px;
-            padding: 15px;
-            border-bottom: 2px solid #ddd;
+        .filter-status {
+            margin: 20px 0;
         }
 
-        .order-section:last-child {
-            border-bottom: none;
-        }
-
-        .order-item {
-            display: flex;
-            align-items: center;
-            padding: 15px 0;
-            border-bottom: 1px solid #ddd;
+        .filter-status label {
+            margin-right: 15px;
         }
 
         .order-card {
@@ -46,11 +37,12 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
             padding: 20px;
-
         }
 
-        .order-item:last-child {
-            border-bottom: none;
+        .order-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
         }
 
         .book-image {
@@ -65,18 +57,8 @@
             flex: 1;
         }
 
-        .order-details h3 {
+        .order-details h5 {
             margin: 0 0 5px;
-        }
-
-        .order-details p {
-            margin: 5px 0;
-            font-size: 14px;
-        }
-
-        .order-actions {
-            display: flex;
-            justify-content: flex-end;
         }
 
         .order-actions button {
@@ -87,22 +69,15 @@
             border-radius: 4px;
             cursor: pointer;
             font-size: 14px;
+            margin-right: 10px;
         }
 
         .order-actions button:hover {
-            background-color: #a72828;
+            background-color: #871d1d;
         }
 
         .status {
             font-weight: bold;
-        }
-
-        .status.Delivered {
-            color: green;
-        }
-
-        .status.Shipped {
-            color: green;
         }
 
         .status.Pending {
@@ -113,9 +88,24 @@
             color: orange;
         }
 
-        .status.Canceled {
+        .status.Shipped {
+            color: green;
+        }
+
+        .status.Delivered {
+            color: green;
+        }
+
+        .status.Cancelled,
+        .status["Cancel Request"] {
             color: red;
         }
+
+        .status.Returned,
+        .status["Return Request"] {
+            color: purple;
+        }
+       
     </style>
 </head>
 
@@ -127,27 +117,27 @@
                 <div class="list-group">
                     <a href="/profile" class="list-group-item list-group-item-action">Profile</a>
                     <a href="/wallet" class="list-group-item list-group-item-action">Wallet</a>
-                    <a href="/myorders" class="list-group-item list-group-item-action">My orders</a>
-                    <a href="/availableCoupons" class="list-group-item list-group-item-action">coupons</a>
+                    <a href="/myorders" class="list-group-item list-group-item-action active">My Orders</a>
+                    <a href="/availableCoupons" class="list-group-item list-group-item-action">Coupons</a>
                 </div>
             </div>
 
-            <div class="col-md-9 p-5">
+            <div class="col-md-9">
                 <h2>Order History</h2>
-                <!-- Filter Section -->
+
+                <!-- Filter Section 
                 <div class="filter-status">
                     <label><input type="radio" name="orderStatus" value="All" checked> All</label>
                     <label><input type="radio" name="orderStatus" value="Pending"> Pending</label>
                     <label><input type="radio" name="orderStatus" value="Processing"> Processing</label>
                     <label><input type="radio" name="orderStatus" value="Shipped"> Shipped</label>
                     <label><input type="radio" name="orderStatus" value="Delivered"> Delivered</label>
-                    <label><input type="radio" name="orderStatus" value="Cancel Request"> Cancel Request</label>
                     <label><input type="radio" name="orderStatus" value="Cancelled"> Cancelled</label>
                     <label><input type="radio" name="orderStatus" value="Return Request"> Return Request</label>
                     <label><input type="radio" name="orderStatus" value="Returned"> Returned</label>
-                </div>
+                </div>-->
 
-                <!-- Dynamic Orders Section -->
+                <!-- Orders Section -->
                 <div class="filtered-orders">
                     {{#if orderItems.length}}
                     {{#each orderItems as |order|}}
@@ -160,128 +150,332 @@
                                 <h5>{{item.bookName}}</h5>
                                 <p>Quantity: {{item.quantity}}</p>
                                 <p>Price: Rs {{item.price}}</p>
-                                <p>Offer Discount: {{item.offerDiscount}}%</p>
                                 <p>Offer Price: Rs {{item.offerPrice}}</p>
+                                <p>couponDiscount : Rs {{item.couponDiscount}}</p>
+                                  <p>finalAmount : Rs {{item.finalAmount}}</p>
+                                <p>Status: <span class="status {{item.status}}">{{item.status}}</span></p>
                             </div>
-                        </div>
-                        {{/each}}
-                        <div class="order-section">
-                            <p>Shipping Address: {{order.userAddress}}</p>
-                            <p class="status {{order.status}}">Status: {{order.status}}</p>
-                            <p>Payment Method: {{order.paymentMethod}}</p>
-                            <p>Total Price: Rs {{order.totalPrice}}</p>
-                              <p>Coupon Discount: Rs {{order.couponDiscount}}</p>
-                            <p>Final Amount: Rs {{order.finalAmount}}</p>
+
                             <div class="order-actions">
-                                {{#if (and (or (eq order.status "Pending") (eq order.status "Processing")) (not
-                                order.reason))}}
-                                <input type="hidden" value="{{order.id}}" class="orderId">
+                               {{#if (not (eq order.paymentStatus "Pending") )}}
+                                {{#if (and (or (eq item.status "Pending") (eq item.status "Processing")) (not
+                                item.reason))}}
+                                <input type="hidden" value="{{item.id}}" class="orderId">
                                 <button type="button" class="cancelOrderBtn">Cancel Order</button>
-                                {{else if (and (or (eq order.status "Shipped") (eq order.status "Delivered")) (not
-                                order.reason))}}
-                                <input type="hidden" value="{{order.id}}" class="orderId">
-                                <button type="button" class="returnOrdeBtn">Return Order</button>
+                                {{else if (and (or (eq item.status "Shipped") (eq item.status "Delivered")) (not
+                                item.reason))}}
+                                <input type="hidden" value="{{item.id}}" class="orderId">
+                                <button type="button" class="returnOrderBtn">Return Order</button>
+                                {{/if}}
                                 {{/if}}
                             </div>
                         </div>
+                        {{/each}}
+                        <p>Shipping Address: {{order.userAddress}}</p>
+                        <p>Payment Method: {{order.paymentMethod}}</p>
+                        <p>Total Price: Rs {{order.totalPrice}}</p>
+                        <p>Final Amount: Rs {{order.finalAmount}}</p>
+                         <div class="order-actions">
+                           {{#if (and (eq order.paymentStatus "Pending") (eq order.paymentMethod "online"))}}
+                                <input type="hidden" value="{{order.id}}" class="orderId">
+                                <button type="button" class="retryPaymentBtn">Retry Payment</button>
+                                {{/if}}
+                         </div>
                     </div>
+                  <p id="Error"></p>
                     {{/each}}
                     {{else}}
-                    <p>{{message}}</p>
+                    <p>No orders found.</p>
                     {{/if}}
                 </div>
             </div>
-
-
-
         </div>
     </div>
 
     {{> user/footer}}
 
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        /* document.addEventListener('DOMContentLoaded', () => {
+             // Function to filter orders based on status
+             function filterOrders() {
+                 document.querySelectorAll('input[name="orderStatus"]').forEach(radio => {
+                     radio.addEventListener('change', async function () {
+                         const status = this.value;
+     
+                         try {
+                             const response = await fetch(`/filter-orders?status=${status}`);
+                             const data = await response.json();
+     
+                             if (data.success) {
+                                 const ordersContainer = document.querySelector('.filtered-orders');
+                                 ordersContainer.innerHTML = data.orderItems.length > 0
+                                     ? data.orderItems.map(order => `
+                                         <div class="order-card">
+                                             ${order.items.map(item => `
+                                                 <div class="order-item">
+                                                     <img src="/uploads/product-images/${item.productImage}" alt="Book Image" class="book-image">
+                                                     <div class="order-details">
+                                                         <h5>${item.bookName}</h5>
+                                                         <p>Quantity: ${item.quantity}</p>
+                                                         <p>Price: Rs ${item.price}</p>
+                                                         <p>Offer Discount: ${item.offerDiscount}%</p>
+                                                         <p>Offer Price: Rs ${item.offerPrice}</p>
+                                                     </div>
+                                                 </div>
+                                             `).join('')}
+                                             <div class="order-actions">
+                                                 ${item.status === "Pending" && order.paymentMethod === "online" ? `
+                                                     <input type="hidden" value="${item.id}" class="orderId">
+                                                     <button type="button" class="retryPaymentBtn">Retry Payment</button>
+                                                 ` : ''}
+                                                 ${(item.status === "Pending" || item.status === "Processing") && !item.reason ? `
+                                                     <input type="hidden" value="${item.id}" class="orderId">
+                                                     <button type="button" class="cancelOrderBtn">Cancel Order</button>
+                                                 ` : ''}
+                                                 ${(item.status === "Shipped" || item.status === "Delivered") && !item.reason ? `
+                                                     <input type="hidden" value="${item.id}" class="orderId">
+                                                     <button type="button" class="returnOrderBtn">Return Order</button>
+                                                 ` : ''}
+                                             </div>
+                                             <div class="order-section">
+                                                 <p>Shipping Address: ${order.userAddress}</p>
+                                                 <p class="status ${order.status}">Status: ${order.status}</p>
+                                                 <p>Payment Method: ${order.paymentMethod}</p>
+                                                 <p>Total Price: Rs ${order.totalPrice}</p>
+                                                 <p>Coupon Discount: Rs ${order.couponDiscount}</p>
+                                                 <p>Final Amount: Rs ${order.finalAmount}</p>
+                                             </div>
+                                         </div>
+                                     `).join('')
+                                     : `<p>No orders found for the selected status.</p>`;
+     
+                                 // Reinitialize event listeners for dynamically added buttons
+                                 initializeRetryPaymentButtons();
+                                 initializeCancelOrderButtons();
+                                 initializeReturnOrderButtons();
+                             } else {
+                                 Swal.fire({
+                                     title: 'Error!',
+                                     text: 'Unable to fetch orders. Please try again later.',
+                                     icon: 'error',
+                                     confirmButtonColor: '#3085d6',
+                                 });
+                             }
+                         } catch (error) {
+                             console.error('Error fetching orders:', error);
+                             Swal.fire({
+                                 title: 'Error!',
+                                 text: 'An error occurred. Please try again later.',
+                                 icon: 'error',
+                                 confirmButtonColor: '#3085d6',
+                             });
+                         }
+                     });
+                 });
+             }*/
+
+        // Initialize event listeners for Retry Payment
+        /* function initializeRetryPaymentButtons() {
+             document.querySelectorAll('.retryPaymentBtn').forEach(button => {
+                 button.addEventListener('click', async function () {
+                     const orderId = this.previousElementSibling.value;
+ 
+                     try {
+                         const confirmRetry = await Swal.fire({
+                             title: 'Retry Payment?',
+                             text: "Do you want to retry payment for this order?",
+                             icon: 'warning',
+                             showCancelButton: true,
+                             confirmButtonColor: '#3085d6',
+                             cancelButtonColor: '#d33',
+                             confirmButtonText: 'Yes, retry!'
+                         });
+ 
+                         if (confirmRetry.isConfirmed) {
+                             window.location.href = `/retry-payment/${orderId}`;
+                         }
+                     } catch (error) {
+                         console.error('Error retrying payment:', error);
+                         Swal.fire({
+                             title: 'Error!',
+                             text: 'Unable to retry payment. Try again later.',
+                             icon: 'error'
+                         });
+                     }
+                 });
+             });
+         }
+ 
+         // Initialize event listeners for Cancel Order
+         function initializeCancelOrderButtons() {
+             document.querySelectorAll('.cancelOrderBtn').forEach(button => {
+                 button.addEventListener('click', async function () {
+                     const orderId = this.previousElementSibling.value;
+ 
+                     try {
+                         const confirmCancel = await Swal.fire({
+                             title: 'Are you sure?',
+                             text: "Do you really want to cancel this order?",
+                             icon: 'warning',
+                             showCancelButton: true,
+                             confirmButtonColor: '#3085d6',
+                             cancelButtonColor: '#d33',
+                             confirmButtonText: 'Yes, cancel it!',
+                             cancelButtonText: 'No, keep it'
+                         });
+ 
+                         if (confirmCancel.isConfirmed) {
+                             window.location.href = `/cancel-orders/${orderId}`;
+                         }
+                     } catch (error) {
+                         console.error("Error canceling order:", error);
+                         Swal.fire({
+                             title: 'Error!',
+                             text: 'An error occurred. Please try again later.',
+                             icon: 'error',
+                             confirmButtonColor: '#3085d6'
+                         });
+                     }
+                 });
+             });
+         }
+ 
+         // Initialize event listeners for Return Order
+         function initializeReturnOrderButtons() {
+             document.querySelectorAll('.returnOrderBtn').forEach(button => {
+                 button.addEventListener('click', async function () {
+                     const orderId = this.previousElementSibling.value;
+ 
+                     try {
+                         const confirmReturn = await Swal.fire({
+                             title: 'Are you sure?',
+                             text: "Do you really want to return this order?",
+                             icon: 'warning',
+                             showCancelButton: true,
+                             confirmButtonColor: '#3085d6',
+                             cancelButtonColor: '#d33',
+                             confirmButtonText: 'Yes, return it!',
+                             cancelButtonText: 'No, keep it'
+                         });
+ 
+                         if (confirmReturn.isConfirmed) {
+                             window.location.href = `/return-orders/${orderId}`;
+                         }
+                     } catch (error) {
+                         console.error("Error returning order:", error);
+                         Swal.fire({
+                             title: 'Error!',
+                             text: 'An error occurred. Please try again later.',
+                             icon: 'error',
+                             confirmButtonColor: '#3085d6'
+                         });
+                     }
+                 });
+             });
+         }
+ 
+         // Initialize everything on page load
+         //filterOrders();
+         initializeRetryPaymentButtons();
+         initializeCancelOrderButtons();
+         initializeReturnOrderButtons();
+     });*/
+    </script>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // Function to fetch and filter orders based on status
-        function filterOrders() {
-            document.querySelectorAll('input[name="orderStatus"]').forEach(radio => {
-                radio.addEventListener('change', async function () {
-                    const status = this.value;
+  // Initialize event listeners for Retry Payment
+  function initializeRetryPaymentButtons() {
+    document.querySelectorAll('.retryPaymentBtn').forEach(button => {
+      button.addEventListener('click', async function () {
+        const orderId = this.previousElementSibling.value;
 
-                    try {
-                        const response = await fetch(`/filter-orders?status=${status}`);
-                        const data = await response.json();
+        fetch("/retryPayment", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ orderId }) // Send as JSON object
+        })
+          .then(response => response.json())
+          .then(data => {
+            if (data.error) {
+              document.getElementById("Error").textContent = data.error;
+            } else {
+              // Trigger Razorpay checkout if order creation was successful
+              const { razorpayOrderId, finalAmount } = data;
 
-                        if (data.success) {
-                            const ordersContainer = document.querySelector('.filtered-orders');
-                            ordersContainer.innerHTML = data.orderItems.length > 0
-                                ? data.orderItems.map(order => `
-                                    <div class="order-card">
-                                        ${order.items.map(item => `
-                                            <div class="order-item">
-                                                <img src="/uploads/product-images/${item.productImage}" alt="Book Image" class="book-image">
-                                                <div class="order-details">
-                                                    <h5>${item.bookName}</h5>
-                                                    <p>Quantity: ${item.quantity}</p>
-                                                    <p>Price: Rs ${item.price}</p>
-                                                    <p>Offer Discount: ${item.offerDiscount}%</p>
-                                                    <p>Offer Price: Rs ${item.offerPrice}</p>
-                                                </div>
-                                            </div>
-                                        `).join('')}
-                                        <div class="order-section">
-                                            <p>Shipping Address: ${order.userAddress}</p>
-                                            <p class="status ${order.status}">Status: ${order.status}</p>
-                                            <p>Payment Method: ${order.paymentMethod}</p>
-                                            <p>Total Price: Rs ${order.totalPrice}</p>
-                                             <p>Coupon Discount: Rs ${order.couponDiscount}</p>
-                                            <p>Final Amount: Rs ${order.finalAmount}</p>
-                                            <div class="order-actions">
-                                                ${(() => {
-                                                    if ((order.status === "Pending" || order.status === "Processing") && !order.reason) {
-                                                        return `
-                                                            <input type="hidden" value="${order.id}" class="orderId">
-                                                            <button type="button" class="cancelOrderBtn">Cancel Order</button>
-                                                        `;
-                                                    } else if ((order.status === "Shipped" || order.status === "Delivered") && !order.reason) {
-                                                        return `
-                                                            <input type="hidden" value="${order.id}" class="orderId">
-                                                            <button type="button" class="returnOrderBtn">Return Order</button>
-                                                        `;
-                                                    } else {
-                                                        return '';
-                                                    }
-                                                })()}
-                                            </div>
-                                        </div>
-                                    </div>
-                                `).join('')
-                                : `<p>No orders found for the selected status.</p>`;
+              const options = {
+                key: "rzp_test_4MBYamMKeUifHI", // Replace with your Razorpay Key ID
+                amount: finalAmount * 100, // Convert to paise
+                currency: "INR",
+                order_id: razorpayOrderId, // Order ID generated by Razorpay
+                name: "READVIBES",
+                description: "Order Payment",
+                image: "https://example.com/logo.png",
+                handler: function (response) {
+                  // Payment success handler
+                  const paymentData = {
+                    orderId: data.orderId,
+                    razorpayPaymentId: response.razorpay_payment_id,
+                    razorpayOrderId: razorpayOrderId,
+                    razorpaySignature: response.razorpay_signature
+                  };
 
-                            // Reinitialize event listeners for dynamically added buttons
-                            initializeCancelOrderButtons();
-                            initializeReturnOrderButtons();
-                        } else {
-                            Swal.fire({
-                                title: 'Error!',
-                                text: 'Unable to fetch orders. Please try again later.',
-                                icon: 'error',
-                                confirmButtonColor: '#3085d6',
-                            });
-                        }
-                    } catch (error) {
-                        console.error('Error fetching orders:', error);
-                        Swal.fire({
-                            title: 'Error!',
-                            text: 'An error occurred. Please try again later.',
-                            icon: 'error',
-                            confirmButtonColor: '#3085d6',
-                        });
-                    }
-                });
-            });
-        }
+                  fetch("/verify-payment", {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(paymentData)
+                  })
+                    .then(response => response.json())
+                    .then(data => {
+                      if (data.success) {
+                        //window.location.href = `/orderSuccess/${data.orderId}`; // Redirect to success page
+                         location.reload(); 
+                      } else {
+                        alert("Payment verification failed. Please try again.");
+                      }
+                    })
+                    .catch(error => {
+                      console.error("Error verifying payment:", error);
+                    });
+                },
+                prefill: {
+                  name: data.customerName,
+                  email: data.customerEmail,
+                  contact: data.customerPhone
+                },
+                notes: {
+                  address: data.selectedAddress
+                },
+                theme: {
+                  color: "#b58d8e"
+                }
+              };
 
-        // Function to handle cancel order
+              // Initialize Razorpay Checkout
+              const rzp1 = new Razorpay(options);
+              rzp1.open();
+            }
+          })
+          .catch(error => {
+            console.error("Error initiating retry payment:", error);
+          });
+      });
+    });
+  }
+
+
+        // Initialize event listeners for Cancel Order
         function initializeCancelOrderButtons() {
             document.querySelectorAll('.cancelOrderBtn').forEach(button => {
                 button.addEventListener('click', async function () {
@@ -315,7 +509,7 @@
             });
         }
 
-        // Function to handle return order
+        // Initialize event listeners for Return Order
         function initializeReturnOrderButtons() {
             document.querySelectorAll('.returnOrderBtn').forEach(button => {
                 button.addEventListener('click', async function () {
@@ -349,34 +543,13 @@
             });
         }
 
-        // Initialize everything on page load
-        filterOrders();
-        initializeCancelOrderButtons();
-        initializeReturnOrderButtons();
-    });
-</script>
+ initializeRetryPaymentButtons();
+         initializeCancelOrderButtons();
+         initializeReturnOrderButtons();
+
+    </script>
 
 
-
-
-   
-                      
-            
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-
-    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
-        integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
-        integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
-        crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"
-        integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-        crossorigin="anonymous"></script>
 </body>
 
 </html>
