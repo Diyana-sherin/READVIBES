@@ -13,6 +13,7 @@ const addToCart = async (req, res) => {
     //console.log(userId)
     if (!userId) {
         //return res.status(401).json({ message: 'Please log in to add to cart.' });
+        return  res.json({ success : false, message: 'please login to add to cart  ' });
     }
     try {
         const book = await Books.findById(bookId);
@@ -26,6 +27,10 @@ const addToCart = async (req, res) => {
             console.log('Created')
             await User.findByIdAndUpdate(userId, { $push: { cart: cart._id } });
             console.log('Created and added cart reference to user');
+        }
+        if(cart.items.length === 0)
+        {
+            await User.findByIdAndUpdate(userId, { $set: { cart: cart._id } });
         }
         const cartItem = cart.items.find(item => item.bookId.toString() === bookId);
         console.log(cartItem)
@@ -42,7 +47,7 @@ const addToCart = async (req, res) => {
             });
         }
         await cart.save();
-        res.json({ message: 'Added to cart successfully!' });
+        res.json({ success: true , message: 'Added to cart successfully!' });
         console.log('Success')
 
     } catch (error) {
@@ -279,6 +284,12 @@ const deleteItems = async (req, res) => {
 
 
         await cart.save();
+
+         if (cart.items.length === 0) {
+            console.log('cart is empty. Retaining the reference in the user document.');
+        }
+
+
         res.json({ success: true, message: 'Item deleted successfully' });
     }
     catch (error) {

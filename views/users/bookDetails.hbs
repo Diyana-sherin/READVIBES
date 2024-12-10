@@ -267,7 +267,7 @@
 </head>
 
 <body>
-    {{> user/header}}
+    {{> user/header  user}}
     <div class="container">
         <div class="my-4">
             <ol class="breadcrumb"
@@ -449,6 +449,8 @@
                     })
                         .then(res => res.json())
                         .then(data => {
+                            if(data.success)
+                          {
                             Swal.fire({
                                 toast: true,
                                 position: 'top-end',
@@ -458,6 +460,19 @@
                                 timer: 1500,
                                 timerProgressBar: true,
                             });
+                          }
+                          else if(!data.success)
+                          {
+                             Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'error',
+                                title: data.message,
+                                showConfirmButton: false,
+                                timer: 1500,
+                                timerProgressBar: true,
+                            });
+                        }
                         })
                         .catch(error => {
                             console.log("Error:", error);
@@ -482,6 +497,8 @@
                     })
                         .then(res => res.json())
                         .then(data => {
+                          if(data.success)
+                          {
                             Swal.fire({
                                 toast: true,
                                 position: 'top-end',
@@ -491,6 +508,19 @@
                                 timer: 1500,
                                 timerProgressBar: true,
                             });
+                          }
+                          else if(!data.success)
+                          {
+                             Swal.fire({
+                                toast: true,
+                                position: 'top-end',
+                                icon: 'error',
+                                title: data.message,
+                                showConfirmButton: false,
+                                timer: 1500,
+                                timerProgressBar: true,
+                            });
+                        }
                         })
                         .catch(error => {
                             console.log("Error:", error);

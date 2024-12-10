@@ -11,7 +11,7 @@ const bcrypt = require('bcrypt')
 
 
 //loadhome
-const loadHome = async (req, res) => {
+/*const loadHome = async (req, res) => {
     try {
         const categories = await Category.find({ status: "listed" })
 
@@ -180,7 +180,7 @@ const loadHome = async (req, res) => {
         console.log("Home page not found");
         res.status(500).send("Server Error")
     }
-}
+}*/
 
 
 //loadlogin
@@ -395,7 +395,7 @@ const verifyOtp = async (req, res) => {
 
 
 
-            res.json({ success: true, redirectUrl: "/homelog" });
+            res.json({ success: true, redirectUrl: "/" });
         } else {
             res.status(400).json({ success: false, message: "Invalid OTP, please try again" });
             console.log("Error: Invalid OTP");
@@ -470,7 +470,7 @@ const login = async (req, res) => {
             collections = collections.slice(0, 4);
 
             //res.render('users/homelog', { Newbooks: bookData, books: collections });
-            res.redirect('/homelog')
+            res.redirect('/')
         }
     } catch (error) {
         console.error("Login error:", error);
@@ -484,6 +484,7 @@ const loadhomelog = async (req, res) => {
     try {
         const categories = await Category.find({ isListed: true })
         let offer;
+        const user = req.session.user;
 
 
         let bookData = await Books.find(
@@ -653,8 +654,9 @@ const loadhomelog = async (req, res) => {
         res.render('users/homelog', {
             Newbooks: books, books: collections,
             breadcrumbs: [
-                { name: "Home", url: "/homelog" },
+                { name: "Home", url: "/" },
             ],
+            user,
         })
     }
     catch (error) {
@@ -670,7 +672,11 @@ const loadviewMore = async (req, res) => {
         const sortOption = req.query.sort || 'new';
         const searchQuery = req.query.search || '';
         const selectedCategory = req.query.category || 'All';
+
+        const user = req.session.user;
+        console.log("User",user)
        
+
         console.log(searchQuery)
 
         let categoryFilter = {};
@@ -792,12 +798,14 @@ const loadviewMore = async (req, res) => {
             categories, // All categories for the filter UI
 
             breadcrumbs: [
-                { name: "Home", url: "/homelog" },
+                { name: "Home", url: "/" },
                 { name: "viewmore", url: "/viewmore" }
             ],
             sortOption,
             searchQuery,
-            selectedCategory
+            selectedCategory,
+            user
+
         });
     } catch (error) {
         console.error(error);
@@ -817,6 +825,8 @@ const bookDetails = async (req, res) => {
     try {
         const bookId = req.params.id;
         const categories = await Category.find({ isListed: true })
+
+        const user= req.session.user;
 
         const books = await Books.findById(bookId)
         .populate("category")
@@ -1008,11 +1018,12 @@ const bookDetails = async (req, res) => {
         res.render('users/bookDetails', {
             book: books, books: ListedBooks, offer: offerDetails,
             breadcrumbs: [
-                { name: "Home", url: "/homelog" },
+                { name: "Home", url: "/" },
                 { name: "viewmore", url: "/viewmore" },
                 { name: "bookdetails", url: "/bookDetails/:id" },
 
-            ]
+            ],
+            user,
         });
     } catch (error) {
         console.error("Error fetching book details:", error);
@@ -1041,7 +1052,7 @@ const logout = async (req, res) => {
 
 
 module.exports = {
-    loadHome,
+   // loadHome,
     loadLogin,
     loadsignup,
     signup,

@@ -676,7 +676,7 @@ const placeOrder = async (req, res) => {
 
         if (cartId) {
             await Cart.findByIdAndDelete(cartId);
-            
+            await User.findByIdAndUpdate(userId, { $set: { cart : [] } });
         }
 
         await Promise.all(

@@ -10,6 +10,73 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <style>
+         #link {
+      font-size: 20px;
+    }
+
+    #head {
+      background-color: #d4a3a3;
+      color: black;
+    }
+
+    .header {
+      background-color: #d4a3a3;
+    }
+
+    a {
+      color: black;
+    }
+
+    .sb-button {
+      background-color: #b47a7a;
+      border-radius: 15px;
+      padding: 7px 16px;
+      text-align: center;
+      text-decoration: none;
+      transition: all .2s ease;
+    }
+
+    .footer {
+      background-color: #f8f9fa;
+      padding: 20px 0;
+      text-align: center;
+    }
+
+    .logo {
+      font-weight: 700;
+      color: #000000;
+    }
+
+    #link a:hover {
+      color: #4a4848;
+    }
+
+    /* Navbar smooth transition when expanding */
+    .navbar-collapse {
+      transition: max-height 0.3s ease-in-out;
+    }
+
+    /* Remove max-height limit to allow full-height for larger screens */
+    .navbar-collapse.show {
+      max-height: 500px; 
+    }
+
+    @media (max-width: 991px) {
+      .navbar-collapse {
+        display: none;
+      }
+
+      .navbar-collapse.show {
+        display: block;
+      }
+    }
+
+    /* Fix for larger screens to always show navbar */
+    @media (min-width: 992px) {
+      .navbar-collapse {
+        display: block !important;
+      }
+    }
         body {
             font-family: 'Arial', sans-serif;
             background-color: #f8f9fa;
@@ -137,7 +204,9 @@
 </head>
 
 <body>
-    {{> user/header}}
+    
+{{> user/header user }}
+
     <div class="signup-container">
         <div class="signup-box">
 
@@ -228,6 +297,25 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.4.1/dist/js/bootstrap.min.js"
         integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
         crossorigin="anonymous"></script>
+
+
+<script>
+    $(document).ready(function () {
+      $('#navbarToggle').on('click', function () {
+        $('#navbarSupportedContent').toggleClass('show');
+        const toggleIcon = $('#toggleIcon');
+
+        // Toggle between navicon and times icon
+        if (toggleIcon.hasClass('fa-navicon')) {
+          toggleIcon.removeClass('fa-navicon').addClass('fa-times');
+        } else {
+          toggleIcon.removeClass('fa-times').addClass('fa-navicon');
+        }
+      });
+    });
+  </script>
+
+
 </body>
 
 </html>

@@ -8,55 +8,16 @@ const Offer = require('../../models/offerSchema')
 
 
 
-/*const addToWishlist = async (req, res) => {
-    const bookId = req.params.bookId;
-    const userId = req.session.user;
 
-    if (!userId) {
-        return res.status(401).json({ message: 'Please log in to add to wishlist.' });
-    }
-
-    try {
-        const book = await Books.findById(bookId);
-        if (!book) {
-            return res.status(404).json({ message: "Book not found." });
-        }
-
-        let wishlist = await Wishlist.findOne({ userId });
-        
-        
-        if (!wishlist) {
-            wishlist = new Wishlist({ userId, items: [] });
-            await wishlist.save();
-            await User.findByIdAndUpdate(userId, { $push: { wishlist: wishlist._id } });
-            console.log('Created and added wishlist reference to user');
-        }
-
-       
-        const wishlistItem = wishlist.items.find(item => item.bookId.toString() === bookId);
-        
-        if (!wishlistItem) {
-            // Add the item to wishlist 
-            wishlist.items.push({ bookId });
-            await wishlist.save();
-            console.log('Item added to wishlist');
-        } else {
-            console.log('Item already in wishlist');
-        }
-
-        res.json({ message: 'Added to Wishlist successfully!' });
-    } catch (error) {
-        console.error('Error:', error);
-        res.status(500).json({ message: 'An error occurred. Please try again later.' });
-    }
-};*/
 
 const addToWishlist = async (req, res) => {
     const bookId = req.params.bookId;
     const userId = req.session.user;
+    console.log(userId)
 
     if (!userId) {
-        return res.status(401).json({ message: 'Please log in to add to wishlist.' });
+        // return res.status(401).json({ message: 'Please log in to add to wishlist.' });
+        return res.json({ success: false, message: 'please login to add to wishlist ' });
     }
 
     try {
@@ -70,7 +31,7 @@ const addToWishlist = async (req, res) => {
         let wishlist = await Wishlist.findOne({ userId });
         if (!wishlist) {
             wishlist = new Wishlist({ userId, items: [] });
-            await User.findByIdAndUpdate(userId, { $push: { wishlist :wishlist._id } });
+            await User.findByIdAndUpdate(userId, { $push: { wishlist: wishlist._id } });
             console.log('Created and added whishlist reference to user');
         }
 
@@ -79,7 +40,7 @@ const addToWishlist = async (req, res) => {
             item => item.bookId.toString() === bookId
         );
 
-        
+
 
         if (!wishlistItem) {
             wishlist.items.push({ bookId }); // Add the book to the wishlist
@@ -87,10 +48,10 @@ const addToWishlist = async (req, res) => {
             console.log('Item added to wishlist');
         } else {
             console.log('Item already in wishlist');
-            return res.json({ message: 'Item already in wishlist' });
+            return res.json({ success: true, message: 'Item already in wishlist' });
         }
 
-        res.json({ message: 'Added to Wishlist successfully!' });
+        res.json({ success: true, message: 'Added to Wishlist successfully!' });
     } catch (error) {
         console.error('Error adding to wishlist:', error);
 
@@ -131,7 +92,7 @@ const loadWishlist = async (req, res) => {
                 ]
             });
         }
-       
+
 
         const wishlistItems = wishlist.items.map(item => ({
             Id: item._id,
@@ -152,8 +113,7 @@ const loadWishlist = async (req, res) => {
             bookOffers.sort((a, b) => b.discount - a.discount)
             //console.log(catOffers)
             // console.log(bookOffers)
-            if(!catOffers && !bookOffers)
-            {
+            if (!catOffers && !bookOffers) {
                 console.log("ok")
                 continue;
             }
@@ -186,50 +146,48 @@ const loadWishlist = async (req, res) => {
 
             //console.log(greatestDiscountcatOffer)
             //console.log(greatestDiscountbookOffer)
-            let offer ;
+            let offer;
 
-             if (!greatestDiscountcatOffer  && !greatestDiscountbookOffer ) 
-             {
-                 console.log(`No valid offers for ${item.bookName}. Moving to the next item.`);
+            if (!greatestDiscountcatOffer && !greatestDiscountbookOffer) {
+                console.log(`No valid offers for ${item.bookName}. Moving to the next item.`);
                 continue;
-             }
-             else if(!greatestDiscountcatOffer)
-             {
+            }
+            else if (!greatestDiscountcatOffer) {
                 offer = greatestDiscountbookOffer;
-             }
-             else if (!greatestDiscountbookOffer)
-             {
+            }
+            else if (!greatestDiscountbookOffer) {
                 offer = greatestDiscountcatOffer;
-             }
-             else
-             {
+            }
+            else {
                 offer = greatestDiscountbookOffer.discount > greatestDiscountcatOffer.discount ? greatestDiscountbookOffer : greatestDiscountcatOffer
-             }
-             
+            }
+
             //console.log(offer)
 
             //item.offerPrice = item.salePrice * ((100 - offer.discount) / 100)
             item.offerName = offer.offerName
             item.discount = offer.discount;
-          
-            item.offerPrice = item.salePrice  * ((100 - offer.discount) / 100)
+
+            item.offerPrice = item.salePrice * ((100 - offer.discount) / 100)
 
 
         }
 
-       
+
 
 
 
         console.log(wishlistItems)
-        
 
 
 
-        res.render('users/wishlist', { wishlistItems,  breadcrumbs: [
-            { name: "Home", url: "/homelog" },
-            { name: "wishlist", url: "/wishlist" }
-        ]});
+
+        res.render('users/wishlist', {
+            wishlistItems, breadcrumbs: [
+                { name: "Home", url: "/homelog" },
+                { name: "wishlist", url: "/wishlist" }
+            ]
+        });
 
 
     } catch (error) {
@@ -246,10 +204,16 @@ const deleteItems = async (req, res) => {
         const wishlist = await Wishlist.findOne({ userId });
         const initialItemCount = wishlist.items.length;
         wishlist.items = wishlist.items.filter(item => item.bookId.toString() !== itemId);
-        //Cart.deleteOne({ _id: itemId });
-
+       
 
         await wishlist.save();
+
+        if (wishlist.items.length === 0) {
+            console.log('Wishlist is empty. Retaining the reference in the user document.');
+        }
+
+
+
         res.json({ success: true, message: 'Item deleted successfully' });
     }
     catch (error) {

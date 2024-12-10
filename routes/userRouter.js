@@ -14,14 +14,14 @@ const walletController = require('../controllers/user/walletController')
 
 
 
-router.get('/',userController.loadHome)
+//router.get('/',userController.loadHome)
 router.get('/login',userController.loadLogin)
 router.post('/login',userController.login)
 router.get('/signup',userController.loadsignup)
 router.post('/signup',userController.signup)
 router.post('/verifyOtp',userController.verifyOtp)
 router.post('/resendOtp',userController.resendOtp)
-router.get('/homelog',userAuth,userController.loadhomelog)
+router.get('/',userController.loadhomelog)
 router.get('/logout',userController.logout)
 
 //sigle signup
@@ -29,7 +29,7 @@ router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 
 router.get('/auth/google/callback', passport.authenticate('google', { failureRedirect: '/signup' }), (req, res) => {
     req.session.user = req.user._id;
     console.log(req.user)
-    res.redirect('/homelog');
+    res.redirect('/');
 });
 
 // Handle signup error for duplicate emails
@@ -49,20 +49,20 @@ router.post('/reset-password',forgetController.resetPassword)
 
 
 //view more
-router.get('/viewmore',userAuth,userController.loadviewMore)
+router.get('/viewmore',userController.loadviewMore)
 
 //details
-router.get('/bookDetails/:id',userAuth, userController.bookDetails);
+router.get('/bookDetails/:id', userController.bookDetails);
 
 //cart
-router.post('/addToCart/:bookId',userAuth,cartController.addToCart)
+router.post('/addToCart/:bookId',cartController.addToCart)
 router.get('/cart',userAuth,cartController.loadCart)
 router.post('/cart/increase-quantity/:id', cartController.increaseQuantity);
 router.post('/cart/decrease-quantity/:id', cartController.decreaseQuantity);
 router.delete('/cart/delete-item/:id',cartController.deleteItems)
 
 //wishlist 
-router.post('/addWishlist/:bookId',userAuth,wishlistController.addToWishlist)
+router.post('/addWishlist/:bookId',wishlistController.addToWishlist)
 router.get('/wishlist',userAuth,wishlistController.loadWishlist)
 router.delete('/wishlist/delete-item/:id',wishlistController.deleteItems)
 
