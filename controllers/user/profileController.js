@@ -422,7 +422,7 @@ const getOrderCancelPage = async (req, res) => {
       const orderDetails = {
         id: order._id,
         paymentMethod: order.paymentMethod,
-        
+        orderDate :  order.createdAt ? order.createdAt.toISOString().split("T")[0] : null,
         itemDetails,
        
     };
@@ -559,7 +559,7 @@ const getOrderReturnPage = async (req,res)=>{
           const orderDetails = {
             id: order._id,
             paymentMethod: order.paymentMethod,
-            
+            orderDate :  order.createdAt ? order.createdAt.toISOString().split("T")[0] : null,
             itemDetails,
            
         };

@@ -26,9 +26,6 @@
       <h3 class="mb-4">Order Summary</h3>
       <input type="hidden" value="{{orderDetails.itemDetails.id}}" id="itemId">
       <p><strong>Order ID:</strong> {{orderDetails.id}}</p>
-      <p>Total Price: Rs {{orderDetails.totalPrice}}</p>
-      <p>Final Amount: Rs {{orderDetails.finalAmount}}</p>
-      <p>Status: {{orderDetails.status}}</p>
       <ul>
       
         <li>
@@ -39,7 +36,7 @@
         </li>
      
       </ul>
-      <p><strong>Order Date:</strong> {{createdAt}}</p>
+      <p><strong>Order Date:</strong> {{orderDetails.orderDate}}</p>
       <p><strong>Payment Method:</strong> {{orderDetails.paymentMethod}}</p>
     </div>
 
