@@ -274,41 +274,39 @@
           </select>
         </div>
 
-<div class="mb-3">
-  <label class="fw-semibold" style="font-size: 0.95rem; color: #343a40;">Filter by Category:</label>
-  <div id="categoryRadioButtons">
-    <div class="form-check">
-      <input class="form-check-input" type="radio" name="category" id="categoryAll" value="All" 
-        {{#if (eq selectedCategory "All")}}checked{{/if}}>
-      <label class="form-check-label" for="categoryAll">All Categories</label>
-    </div>
-    {{#each categories}}
-      <div class="form-check">
-        <input class="form-check-input" type="radio" name="category" id="category{{name}}" value="{{name}}" 
-          {{#if (eq ../selectedCategory name)}}checked{{/if}}>
-        <label class="form-check-label" for="category{{name}}">{{name}}</label>
-      </div>
-    {{/each}}
-  </div>
-</div>
+        <div class="mb-3">
+          <label class="fw-semibold" style="font-size: 0.95rem; color: #343a40;">Filter by Category:</label>
+          <div id="categoryRadioButtons">
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="category" id="categoryAll" value="All" {{#if (eq
+                selectedCategory "All" )}}checked{{/if}}>
+              <label class="form-check-label" for="categoryAll">All Categories</label>
+            </div>
+            {{#each categories}}
+            <div class="form-check">
+              <input class="form-check-input" type="radio" name="category" id="category{{name}}" value="{{name}}" {{#if
+                (eq ../selectedCategory name)}}checked{{/if}}>
+              <label class="form-check-label" for="category{{name}}">{{name}}</label>
+            </div>
+            {{/each}}
+          </div>
+        </div>
 
-
-        <!-- Filter Section 
-        <div class="filter-section mt-4">
-          <h5>Filter by Category</h5>
-          {{#each categories}}
-          <label>
-            <input type="radio" name="category" value="{{this.name}}" {{#if (eq ../selectedCategory
-              this._id)}}checked{{/if}}> {{this.name}}
-          </label>
-          {{/each}}
-        </div>-->
 
 
       </div>
 
-      
+      {{#if searchQuery}}
+      <div class="col-md-10">
+        <div class="container my-4">
+          <P style="font-size: 30px;">Search Result of "{{searchQuery}}"</P>
+        </div>
+      </div>
+      {{/if}}
+
+
       <!-- Book Collection -->
+      {{#if books}}
       <div class="col-md-10">
         <div class="container my-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
@@ -355,153 +353,156 @@
           </div>
         </div>
       </div>
+      {{else}}
+      <div class="col-md-10">
+        <div class="container my-4">
+          <P style="font-size: 30px;">No Matching Items </P>
+        </div>
+      </div>
+      {{/if}}
     </div>
   </div>
 
   {{> user/footer}}
 
 
- 
-   <script>
-  document.addEventListener('DOMContentLoaded', () => {
-    const sortDropdown = document.getElementById('sortDropdown');
-    const categoryRadioButtons = document.getElementsByName('category');
 
-    // Helper to get the selected category
-    const getSelectedCategory = () => {
-      for (let radio of categoryRadioButtons) {
-        if (radio.checked) {
-          return radio.value;
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const sortDropdown = document.getElementById('sortDropdown');
+      const categoryRadioButtons = document.getElementsByName('category');
+
+      // Helper to get the selected category
+      const getSelectedCategory = () => {
+        for (let radio of categoryRadioButtons) {
+          if (radio.checked) {
+            return radio.value;
+          }
         }
-      }
-      return 'All';
-    };
+        return 'All';
+      };
 
-    // Apply filters on sort or category change
-    const applyFilters = () => {
-      const sortOption = sortDropdown.value;
-      const selectedCategory = getSelectedCategory();
-      const searchQuery = new URLSearchParams(window.location.search).get('search') || '';
+      // Apply filters on sort or category change
+      const applyFilters = () => {
+        const sortOption = sortDropdown.value;
+        const selectedCategory = getSelectedCategory();
+        const searchQuery = new URLSearchParams(window.location.search).get('search') || '';
 
-      // Construct the new query string
-      const queryParams = new URLSearchParams({
-        sort: sortOption,
-        category: selectedCategory,
-        search: searchQuery,
+        // Construct the new query string
+        const queryParams = new URLSearchParams({
+          sort: sortOption,
+          category: selectedCategory,
+          search: searchQuery,
+        });
+
+        // Redirect to the updated URL
+        window.location.href = `/viewmore?${queryParams.toString()}`;
+      };
+
+      // Event listener for sort dropdown
+      sortDropdown.addEventListener('change', applyFilters);
+
+      // Event listeners for category radio buttons
+      categoryRadioButtons.forEach(radio => {
+        radio.addEventListener('change', applyFilters);
       });
-
-      // Redirect to the updated URL
-      window.location.href = `/viewmore?${queryParams.toString()}`;
-    };
-
-    // Event listener for sort dropdown
-    sortDropdown.addEventListener('change', applyFilters);
-
-    // Event listeners for category radio buttons
-    categoryRadioButtons.forEach(radio => {
-      radio.addEventListener('change', applyFilters);
     });
-  });
-</script>
+  </script>
 
-<script>
-            document.querySelectorAll(".add-to-cart").forEach(item => {
-                item.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    const bookId = this.getAttribute('data-id');
-                    fetch(`/addToCart/${bookId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                        .then(res => res.json())
-                        .then(data => {
-                          if(data.success)
-                          {
-                            Swal.fire({
-                                toast: true,
-                                position: 'top-end',
-                                icon: 'success',
-                                title: data.message,
-                                showConfirmButton: false,
-                                timer: 1500,
-                                timerProgressBar: true,
-                            });
-                          }
-                          else if(!data.success)
-                          {
-                             Swal.fire({
-                                toast: true,
-                                position: 'top-end',
-                                icon: 'error',
-                                title: data.message,
-                                showConfirmButton: false,
-                                timer: 1500,
-                                timerProgressBar: true,
-                            });
-                        }
-                        }
-                        )
-                        .catch(error => {
-                            console.log("Error:", error);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                text: 'Something went wrong! Please try again later.',
-                            });
-                        });
-                });
+  <script>
+    document.querySelectorAll(".add-to-cart").forEach(item => {
+      item.addEventListener('click', function (event) {
+        event.preventDefault();
+        const bookId = this.getAttribute('data-id');
+        fetch(`/addToCart/${bookId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: data.message,
+                showConfirmButton: false,
+                timer: 1500,
+                timerProgressBar: true,
+              });
+            }
+            else if (!data.success) {
+              Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'error',
+                title: data.message,
+                showConfirmButton: false,
+                timer: 1500,
+                timerProgressBar: true,
+              });
+            }
+          }
+          )
+          .catch(error => {
+            console.log("Error:", error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: 'Something went wrong! Please try again later.',
             });
+          });
+      });
+    });
 
-            document.querySelectorAll(".add-to-wishlist").forEach(item => {
-                item.addEventListener('click', function (event) {
-                    event.preventDefault();
-                    const bookId = this.getAttribute('data-id');
-                    fetch(`/addWishlist/${bookId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    })
-                        .then(res => res.json())
-                        .then(data => {
-                           if(data.success)
-                          {
-                            Swal.fire({
-                                toast: true,
-                                position: 'top-end',
-                                icon: 'success',
-                                title: data.message,
-                                showConfirmButton: false,
-                                timer: 1500,
-                                timerProgressBar: true,
-                            });
-                          }
-                          else if(!data.success)
-                          {
-                             Swal.fire({
-                                toast: true,
-                                position: 'top-end',
-                                icon: 'error',
-                                title: data.message,
-                                showConfirmButton: false,
-                                timer: 1500,
-                                timerProgressBar: true,
-                            });
-                        }
-                        })
-                        .catch(error => {
-                            console.log("Error:", error);
-                            Swal.fire({
-                                icon: 'error',
-                                title: 'Oops...',
-                                text: 'Something went wrong! Please try again later.',
-                            });
-                        });
-                });
+    document.querySelectorAll(".add-to-wishlist").forEach(item => {
+      item.addEventListener('click', function (event) {
+        event.preventDefault();
+        const bookId = this.getAttribute('data-id');
+        fetch(`/addWishlist/${bookId}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          }
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.success) {
+              Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success',
+                title: data.message,
+                showConfirmButton: false,
+                timer: 1500,
+                timerProgressBar: true,
+              });
+            }
+            else if (!data.success) {
+              Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'error',
+                title: data.message,
+                showConfirmButton: false,
+                timer: 1500,
+                timerProgressBar: true,
+              });
+            }
+          })
+          .catch(error => {
+            console.log("Error:", error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Oops...',
+              text: 'Something went wrong! Please try again later.',
             });
-        </script>
+          });
+      });
+    });
+  </script>
 
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>

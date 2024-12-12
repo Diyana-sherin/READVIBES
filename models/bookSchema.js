@@ -46,7 +46,7 @@ const bookSchema = new mongoose.Schema({
     },
     status:{
         type:String,
-        enum:["Available","Out of Stock","Discountinued"],
+        enum:["Available","Out of Stock","Limited Stock","Discountinued"],
         required:true,
         default:"Available"
     },

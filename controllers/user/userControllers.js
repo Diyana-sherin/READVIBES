@@ -908,7 +908,6 @@ const bookDetails = async (req, res) => {
             item.bookOfferDiscount = bookOffer.discount;
             item.bookOfferOfferPrice = item.salePrice * ((100 - bookOffer.discount) / 100);
 
-
         }
 
 
@@ -944,7 +943,8 @@ const bookDetails = async (req, res) => {
                     { name: "viewmore", url: "/viewmore" },
                     { name: "bookdetails", url: "/bookDetails/:id" },
 
-                ]
+                ],
+                user
             });
 
         }
@@ -987,7 +987,7 @@ const bookDetails = async (req, res) => {
                     { name: "viewmore", url: "/viewmore" },
                     { name: "bookdetails", url: "/bookDetails/:id" },
 
-                ]
+                ],user,
             })
         }
         else if (!greatestDiscountcatOffer) {
@@ -1015,6 +1015,7 @@ const bookDetails = async (req, res) => {
         //end of offers
 
         //console.log(books);
+        console.log("User",user)
         res.render('users/bookDetails', {
             book: books, books: ListedBooks, offer: offerDetails,
             breadcrumbs: [

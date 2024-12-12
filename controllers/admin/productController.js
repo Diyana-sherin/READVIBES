@@ -158,6 +158,16 @@ const editBook = async (req, res) => {
             console.log('category not found')
         }
 
+        if(updatedData.quantity < 5)
+        {
+            await Books.updateOne({ _id: id }, { $set: { status: "Limited Stock" } });
+        }
+        else if (updatedData.quantity === 0 )
+        {
+            await Books.updateOne({ _id: id }, { $set: { status: "Limited Stock" } });
+        }
+       
+
         // Update fields with new data
         book.bookName = updatedData.bookName;
         book.authorName = updatedData.authorName;

@@ -70,16 +70,16 @@ const loadOrderPage = async (req, res) => {
         const formatOrder = (order) => ({
             id: order._id,
             orderedItems: order.orderedItems.map(item => ({
-                _id: item._id,                            
+                _id: item._id,
                 bookName: item.bookName,
                 category: item.book?.category?.name,
                 price: item.price,
                 quantity: item.quantity ?? 1,
                 offerDiscount: item.perOfferDiscount ?? 0,
                 couponDiscount: item.couponDiscount.toFixed(2),
-                status:item.status,
+                status: item.status,
                 reason: item.reason,
-                finalAmount : item.finalAmount,
+                finalAmount: item.finalAmount,
             })),
             totalPrice: order.totalPrice,
             finalAmount: order.finalAmount,
@@ -94,11 +94,11 @@ const loadOrderPage = async (req, res) => {
 
         const orders = orderData.map(formatOrder)
         orders.forEach(order => {
-           // console.log("Ordered Items:", order.orderedItems);
+            // console.log("Ordered Items:", order.orderedItems);
         });
 
         res.render('admin/orders', {
-            order:orders,
+            order: orders,
             currentPage: page,
             totalPages: Math.ceil(count / limit),
             search
@@ -127,7 +127,7 @@ const chengeStatus = async (req, res) => {
     try {
         const { itemId } = req.body;
         const { status } = req.body;
-        console.log(itemId,status)
+        console.log(itemId, status)
         const validStatuses = [
             'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancel Request', 'Cancelled', 'Return Request', 'Returned'
         ];
@@ -139,65 +139,110 @@ const chengeStatus = async (req, res) => {
         //console.log(order)
         if (!order) {
             return res.status(404).json({ success: false, message: "Order or item not found." });
-          }
-      
+        }
+
 
         const userId = order.userId;
 
-       
+
         const item = order.orderedItems.find((item) => item._id.toString() === itemId);
         if (!item) {
             return res.status(404).json({ success: false, message: "Item not found." });
-          }
-          item.status = status;
+        }
+        item.status = status;
 
-          await order.save();
-        
+        await order.save();
+        console.log(order)
 
-       
-       
-        if (status === 'Cancelled' || status === 'Returned') {
+        console.log(item.book)
+const ID = item.bookName;
+console.log(ID)
+        const book = await Books.findOne({_id:item.book})
+        console.log(book)
+        const Exitingquantity = book.quantity;
+        console.log(Exitingquantity)
             
-            if (order.paymentMethod === 'online' || order.paymentMethod === 'wallet' ) {
-                
-                let wallet = await Wallet.findOne({ userId: order.userId });
 
-             
-                if (!wallet) {
-                    wallet = new Wallet({
-                        userId: order.userId,
-                        balance: 0,
-                        transactions: [],
+
+
+        if (status === 'Cancelled' || status === 'Returned') {
+            if (Exitingquantity > 5) {
+
+
+                if (order.paymentMethod === 'online' || order.paymentMethod === 'wallet') {
+
+                    let wallet = await Wallet.findOne({ userId: order.userId });
+
+
+                    if (!wallet) {
+                        wallet = new Wallet({
+                            userId: order.userId,
+                            balance: 0,
+                            transactions: [],
+                        });
+                        await wallet.save();
+                        await User.findByIdAndUpdate(userId, { $push: { wallet: wallet._id } });
+                        console.log('Created and added wallet reference to user');
+                    }
+                    //console.log(wallet)
+
+                    wallet.balance += item.finalAmount;
+
+
+                    wallet.transactions.push({
+                        date: new Date(),
+                        type: 'credit',
+                        amount: item.finalAmount,
+                        description: `Refund for Order of  ${item.bookName}`,
                     });
+
+
                     await wallet.save();
-                    await User.findByIdAndUpdate(userId, { $push: { wallet: wallet._id } });
-                    console.log('Created and added wallet reference to user');
+                    //console.log(wallet)
                 }
-                console.log(wallet)
+            } else {
+                if (order.paymentMethod === 'online' || order.paymentMethod === 'wallet') {
 
-                wallet.balance += item.finalAmount;
+                    let wallet = await Wallet.findOne({ userId: order.userId });
 
-                
-                wallet.transactions.push({
-                    date: new Date(),
-                    type: 'credit',
-                    amount: item.finalAmount,
-                    description: `Refund for Order of  ${item.bookName}`,
-                });
 
-                
-                await wallet.save();
-                console.log(wallet)
+                    if (!wallet) {
+                        wallet = new Wallet({
+                            userId: order.userId,
+                            balance: 0,
+                            transactions: [],
+                        });
+                        await wallet.save();
+                        await User.findByIdAndUpdate(userId, { $push: { wallet: wallet._id } });
+                        console.log('Created and added wallet reference to user');
+                    }
+                    //console.log(wallet)
+
+                    wallet.balance += item.finalAmount / 2;
+
+
+                    wallet.transactions.push({
+                        date: new Date(),
+                        type: 'credit',
+                        amount: item.finalAmount/2,
+                        description: `Refund for Order of  ${item.bookName}`,
+                    });
+
+
+                    await wallet.save();
+                    //console.log(wallet)
+                }
             }
         }
-console.log(item)
-      
+        console.log(item)
+
 
         res.redirect('/admin/orders');
+    
     } catch (error) {
-        console.error('Error updating order status:', error);
-        res.status(500).send('Error updating order status.');
-    }
+    console.error('Error updating order status:', error);
+    res.status(500).send('Error updating order status.');
+}
 };
 
 
@@ -229,10 +274,10 @@ const ViewOrderDetails = async (req, res) => {
                 price: item.price,
                 offerDiscount: item.offerDiscount,
                 couponDiscount: item.couponDiscount.toFixed(2),
-                perOfferDiscount : item.perOfferDiscount,
-                  status:item.status,
+                perOfferDiscount: item.perOfferDiscount,
+                status: item.status,
                 productImage: item.book.productImage[0],
-                finalAmount : item.finalAmount,
+                finalAmount: item.finalAmount,
             })),
             finalAmount: order.finalAmount,
             totalPrice: order.totalPrice,
@@ -256,12 +301,12 @@ const ViewOrderDetails = async (req, res) => {
         // console.log("Order Data:", orderData.userId);
 
         res.render('admin/viewDetails', { order: formattedOrder });
+    
     } catch (error) {
         console.error("Error fetching order details:", error);
         res.status(500).send("Error fetching order details");
     }
 };
-
 
 
 
