@@ -1,6 +1,8 @@
 const Coupon = require('../../models/couponSchema')
 
 
+
+//coupons
 const couponInfo = async (req, res) => {
     try {
         const page = parseInt(req.query.page) || 1;
@@ -42,6 +44,8 @@ const couponInfo = async (req, res) => {
 }
 
 
+
+//addCoupons
 const loadAddCoupons = async (req, res) => {
     try {
         res.render('admin/addCoupons');
@@ -78,6 +82,8 @@ const addCoupons = async (req, res) => {
     }
 }
 
+
+//edit 
 const loadEditCoupon = async(req,res)=>{
 
     try {
@@ -125,6 +131,8 @@ const editCoupon = async (req,res)=>{
 
 }
 
+
+//delete 
 const deleteCoupon = async (req,res)=>{
     try {
         const cuoponId = req.params.id;

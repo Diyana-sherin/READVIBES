@@ -155,20 +155,18 @@ const chengeStatus = async (req, res) => {
         console.log(order)
 
         console.log(item.book)
-const ID = item.bookName;
+/*const ID = item.bookName;
 console.log(ID)
         const book = await Books.findOne({_id:item.book})
         console.log(book)
         const Exitingquantity = book.quantity;
         console.log(Exitingquantity)
             
-
+*/
 
 
         if (status === 'Cancelled' || status === 'Returned') {
-            if (Exitingquantity > 5) {
-
-
+           
                 if (order.paymentMethod === 'online' || order.paymentMethod === 'wallet') {
 
                     let wallet = await Wallet.findOne({ userId: order.userId });
@@ -200,40 +198,8 @@ console.log(ID)
                     await wallet.save();
                     //console.log(wallet)
                 }
-            } else {
-                if (order.paymentMethod === 'online' || order.paymentMethod === 'wallet') {
-
-                    let wallet = await Wallet.findOne({ userId: order.userId });
-
-
-                    if (!wallet) {
-                        wallet = new Wallet({
-                            userId: order.userId,
-                            balance: 0,
-                            transactions: [],
-                        });
-                        await wallet.save();
-                        await User.findByIdAndUpdate(userId, { $push: { wallet: wallet._id } });
-                        console.log('Created and added wallet reference to user');
-                    }
-                    //console.log(wallet)
-
-                    wallet.balance += item.finalAmount / 2;
-
-
-                    wallet.transactions.push({
-                        date: new Date(),
-                        type: 'credit',
-                        amount: item.finalAmount/2,
-                        description: `Refund for Order of  ${item.bookName}`,
-                    });
-
-
-                    await wallet.save();
-                    //console.log(wallet)
-                }
-            }
-        }
+            } 
+        
         console.log(item)
 
 

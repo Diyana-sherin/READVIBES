@@ -87,6 +87,8 @@ const userUnBlocked = async (req,res)=>{
   }
 }
 
+
+//user Status
 const updateUserStatus = async (req, res) => {
   try {
       const userId = req.params.id;

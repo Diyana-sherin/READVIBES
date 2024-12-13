@@ -114,7 +114,7 @@
             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <li><a class="dropdown-item" href="#"><i class="fa fa-user"></i> Profile</a></li>
 
-                <li><a class="dropdown-item" href="/admin/logout"><i class="fa fa-sign-out"></i> Logout</a></li>
+                <li onclick="confirmLogout()"><a class="dropdown-item" href="#"><i class="fa fa-sign-out"></i> Logout</a></li>
             </ul>
         </div>
     </div>
@@ -150,6 +150,28 @@
             </li>
         </ul>
     </div>
+
+    <script>
+        async function confirmLogout(){
+            try{
+                const result = await Swal.fire({
+                    title: 'Logout',
+                    text: 'Do you want to Logout ',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No, cancel!',
+                });
+
+                if (result.isConfirmed) {
+                
+                    window.location.href = `/admin/logout`;
+                }
+            }catch{
+                console.error('Error during logout:', error);
+            }
+        }
+    </script>
 
 
     

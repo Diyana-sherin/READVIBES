@@ -124,7 +124,7 @@
                 <li><a class="dropdown-item" href="/wallet"><i class="fa fa-shopping-bag"></i> Wallet</a></li>
                 <li><a class="dropdown-item" href="/availableCoupons"><i class="fa fa-tags"></i> Coupons</a></li>
                 <li><a class="dropdown-item" href="/myorders"><i class="fa fa-cubes"></i> My Orders</a></li>
-                <li><a class="dropdown-item" href="/logout"><i class="fa fa-sign-out"></i> Logout</a></li>
+                <li onclick="confirmLogout()"><a class="dropdown-item" href="#"><i class="fa fa-sign-out"></i> Logout</a></li>
               </ul>
             </li>
             {{else}}
@@ -172,6 +172,28 @@
       });
     });
   </script>
+
+   <script>
+        async function confirmLogout(){
+            try{
+                const result = await Swal.fire({
+                    title: 'Logout',
+                    text: 'Do you want to Logout ',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes',
+                    cancelButtonText: 'No, cancel!',
+                });
+
+                if (result.isConfirmed) {
+                
+                    window.location.href = `/logout`;
+                }
+            }catch{
+                console.error('Error during logout:', error);
+            }
+        }
+    </script>
 </body>
 
 </html>

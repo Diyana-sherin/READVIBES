@@ -628,7 +628,13 @@
 
         const data = await response.json();
         if (data.length === 0) {
-          alert("No data available for the selected filter.");
+          //alert("No data available for the selected filter.");
+           Swal.fire({
+          icon: "error",
+          title: 'No data available for the selected filter.',
+          showConfirmButton: false,
+          timer: 1500,
+        })
           document.getElementById("chartContainer").style.display = "none";
           return;
         }
@@ -640,6 +646,8 @@
       }
     });
   </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

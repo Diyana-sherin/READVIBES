@@ -41,6 +41,8 @@ const loginAdmin = async (req, res) => {
     }
 }
 
+
+//overview
 const loaddash = async (req, res) => {
     try {
 
@@ -61,90 +63,15 @@ const loaddash = async (req, res) => {
             totalRevenue = totalRevenueOb ? totalRevenueOb[0].totalRevenue : 0;
         }
 
-        /*  async function getBestSellingProducts() {
-              const topProducts = await Order.aggregate([
-                  // Unwind orderedItems array
-                  { $unwind: "$orderedItems" },
-                  // Group by book ID and calculate total quantity sold
-                  {
-                      $group: {
-                          _id: "$orderedItems.book",
-                          totalSold: { $sum: "$orderedItems.quantity" }
-                      }
-                  },
-                  // Sort by totalSold in descending order
-                  { $sort: { totalSold: -1 } },
-                  // Limit to top 10 products
-                  { $limit: 10 },
-                  // Lookup to populate book details (optional)
-                  {
-                      $lookup: {
-                          from: "books",
-                          localField: "_id",
-                          foreignField: "_id",
-                          as: "bookDetails"
-                      }
-                  },
-                
-                  {
-                      $project: {
-                          _id: 0,
-                          bookId: "$_id",
-                          totalSold: 1,
-                          bookDetails: { $arrayElemAt: ["$bookDetails", 0] } 
-                      }
-                  }
-              ]);
-              console.log(topProducts);
-          }
-          getBestSellingProducts();
-  
-          async function getBestSellingCategories() {
-              const topCategories = await Order.aggregate([
-                  // Unwind orderedItems array
-                  { $unwind: "$orderedItems" },
-                  // Lookup to join with Books collection
-                  {
-                      $lookup: {
-                          from: "books", // Replace with the actual collection name for Books
-                          localField: "orderedItems.book",
-                          foreignField: "_id",
-                          as: "bookDetails"
-                      }
-                  },
-                  // Unwind bookDetails array
-                  { $unwind: "$bookDetails" },
-                  // Group by category and calculate total quantity sold
-                  {
-                      $group: {
-                          _id: "$bookDetails.category", // Replace 'category' with the field name in Books schema
-                          totalSold: { $sum: "$orderedItems.quantity" }
-                      }
-                  },
-                  // Sort by totalSold in descending order
-                  { $sort: { totalSold: -1 } },
-                  // Limit to top 10 categories
-                  { $limit: 10 },
-                  // Project the required fields
-                  {
-                      $project: {
-                          _id: 0,
-                          category: "$_id",
-                          totalSold: 1
-                      }
-                  }
-              ]);
-              console.log(topCategories);
-          }
-          getBestSellingCategories();*/
-
-
+    
         res.render('admin/dashboard', { totalUsers, totalOrders, totalRevenue })
     } catch (error) {
         console.log("Admin login not found", error)
         res.status(500).send("Server Error")
     }
 }
+
+//Top 10 Products (books)
 
 const topTenProducts = async (req, res) => {
     try {
@@ -163,8 +90,8 @@ const topTenProducts = async (req, res) => {
 }
 
 
-
-const topTenCategories = async (req, res) => {
+//
+const topCategories = async (req, res) => {
     try {
         const topCategories = await Order.aggregate([
             { $unwind: "$orderedItems" },
@@ -188,7 +115,8 @@ const topTenCategories = async (req, res) => {
 }
 
 
-const topCategories = async (req, res) => {
+//Top 10 category
+const topTenCategories = async (req, res) => {
     try {
         const topCategories = await Order.aggregate([
             { $unwind: "$orderedItems" },
@@ -231,7 +159,7 @@ const topCategories = async (req, res) => {
 
 
 
-
+// sale report (table)
 const generateSalesReport = async (req, res) => {
     try {
         const { reportType, customStartDate, customEndDate } = req.body;
@@ -345,6 +273,8 @@ const generateSalesReport = async (req, res) => {
 
 
 
+
+//sales chart(chart)
 const salesChart = async (req, res) => {
     const { filter } = req.body;
 

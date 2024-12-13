@@ -33,7 +33,7 @@ router.get('/logout',adminController.logout)
 router.post('/generate-sales-report', adminController.generateSalesReport);
 router.post('/filter',adminController.salesChart)
 router.get('/top-products',adminController.topTenProducts)
-router.get('/top-categories',adminController.topCategories)
+router.get('/top-categories',adminController.topTenCategories)
 
 //users
 router.get('/users',adminAuth,customerController.userInfo);
