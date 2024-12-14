@@ -376,7 +376,7 @@ const logout = async (req, res) => {
         })
     }
     catch (error) {
-        console.log('Error in logout', err)
+        console.log('Error in  logout', err)
     }
 }
 
