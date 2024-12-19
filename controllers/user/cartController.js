@@ -302,4 +302,10 @@ const deleteItems = async (req, res) => {
 
 
 
-module.exports = { addToCart, loadCart, increaseQuantity, decreaseQuantity, deleteItems }
+module.exports = { 
+    addToCart, 
+    loadCart, 
+    increaseQuantity, 
+    decreaseQuantity, 
+    deleteItems 
+}

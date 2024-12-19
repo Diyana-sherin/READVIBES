@@ -25,18 +25,14 @@ const addBooks = async (req, res) => {
             bookName: books.bookName,
 
         });
-        console.log()
+        
 
         if (!bookExists) {
-            console.log('ok')
-            const images = [];
+           
+            let images = [];
             if (req.files && req.files.length > 0) {
                 for (let i = 0; i < req.files.length; i++) {
-                   // console.log(req.files[i]);
-                    //console.log(typeof (req.files[i]));
-                    //const files = req.files[i];
-                    //console.log(files[i]);
-                    //console.log(typeof (files[i]));
+                
 
                     const originalImagePath = req.files[i].path;
 
@@ -48,8 +44,14 @@ const addBooks = async (req, res) => {
                     
             }
             else{
-                console.log('if error')
+                console.log('Error while assing images')
             }
+
+               
+
+
+               
+
             const categoryId = await Category.findOne({ _id: books.category });
             if (!categoryId) {
                 return res.status(400).json("invalid category name");
@@ -66,7 +68,8 @@ const addBooks = async (req, res) => {
                 createdAt: new Date(),
                 quantity: books.quantity,
                 productImage: images,
-                status: 'Available',
+                //status: 'Available',
+                status : books.quantity < 5 ? "Limited Stock" : books.quantity === 0 ? "Out of Stock"  :  "Available" ,
 
 
             })
@@ -164,7 +167,7 @@ const editBook = async (req, res) => {
         }
         else if (updatedData.quantity === 0 )
         {
-            await Books.updateOne({ _id: id }, { $set: { status: "Limited Stock" } });
+            await Books.updateOne({ _id: id }, { $set: { status: "Out of Stock" } });
         }
        
 
@@ -276,7 +279,6 @@ module.exports = {
     getEditBookPage,
     editBook,
     updateStatus,
-    
     updateBookStatus,
     deleteBook
 }
@@ -298,112 +300,3 @@ module.exports = {
 
 
 
-
-
-
-
-
-/*const Books = require('../../models/bookSchema');
-const Category = require('../../models/categorySchema');
-const multer = require('multer');
-const fs = require('fs');
-const path = require('path');
-const sharp = require('sharp');
-
-// Configure multer to store uploaded files
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');  // Temporary storage
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname));  // Unique filename
-    }
-});
-
-const upload = multer({ storage }).array('images', 3);  // Allow up to 3 images
-
-// Ensure the destination directory exists
-const ensureDirExists = (dir) => {
-    if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-    }
-};
-
-const getAddBooksPage = async (req, res) => {
-    try {
-        const category = await Category.find({ status: "listed" });
-        res.render('admin/addBooks', { categories: category });
-    } catch (error) {
-        console.error(error);
-    }
-};
-
-const addBooks = async (req, res) => {
-    try {
-        const books = req.body;
-
-        // Check if book with the same name already exists
-        const bookExists = await Books.findOne({ bookName: books.bookName });
-        if (bookExists) {
-            return res.status(400).json("Book already exists, please try another name");
-        }
-
-        // Ensure the destination directory exists for resized images
-        const imageSavePath = path.join('public', 'uploads', 'product-images');
-        ensureDirExists(imageSavePath);
-
-        // Initialize array to store processed image filenames
-        const images = [];
-
-        // Process each uploaded file if files are present
-        if (req.files && req.files.length > 0) {
-            for (const file of req.files) {
-                if (file && file.path && file.filename) {
-                    const originalImagePath = file.path;
-                    const resizedImagePath = path.join(imageSavePath, file.filename);
-
-                    // Resize and save the image
-                    await sharp(originalImagePath)
-                        .resize({ width: 440, height: 600 })
-                        .toFile(resizedImagePath);
-
-                    // Remove the original file after resizing (optional)
-                    fs.unlinkSync(originalImagePath);
-
-                    images.push(file.filename);  // Store the filename of the resized image
-                } else {
-                    console.warn("Invalid file object encountered:", file);
-                }
-            }
-        }
-
-        // Find the category ID by category name
-        const category = await Category.findOne({ _id: books.category });
-        if (!category) {
-            console.error('Category not found');
-            return res.status(400).json("Invalid category name");
-        }
-
-        // Create a new book document
-        const newBook = new Books({
-            bookName: books.bookName,
-            description: books.description,
-            category: category._id,  // Reference the category ID
-            regularPrice: books.regularPrice,
-            salePrice: books.salePrice,
-            createdAt: new Date(),
-            quantity: books.quantity,
-            productImage: images,  // Store the array of image filenames
-            status: 'Available',
-        });
-
-        // Save the new book to the database
-        await newBook.save();
-        return res.redirect('/admin/addBooks');
-    } catch (error) {
-        console.error("Error in addBooks:", error);
-        return res.status(500).json("An error occurred while adding the book");
-    }
-};
-
-module.exports = { getAddBooksPage, addBooks };*/

@@ -899,34 +899,6 @@ const download = async (req, res) => {
 
 const axios = require('axios');
 
-/*const distance = async (req, res) => {
-    try {
-        async function getLatLon(pincode) {
-            const apiKey = 'AIzaSyDR4X_1PrKnPxOZWVOMymC5Ng0mtUmjYoc';
-            const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${pincode}&key=${apiKey}`;
-
-            try {
-                const response = await axios.get(url);
-                console.log(response.data); // Log the response for debugging
-                const location = response.data.results[0].geometry.location;
-                return { lat: location.lat, lng: location.lng };
-            } catch (error) {
-                console.error('Error fetching geocode data:', error.message);
-                throw error;
-            }
-        }
-
-        // Call getLatLon with await
-        const { lat, lng } = await getLatLon('560001');
-        console.log(`Latitude: ${lat}, Longitude: ${lng}`);
-
-        // Respond to the route request
-        res.status(200).json({ lat, lng });
-    } catch (error) {
-        console.error("Error in distance function:", error.message);
-        res.status(500).send("Internal Server Error");
-    }
-};*/
 
 
 module.exports = {

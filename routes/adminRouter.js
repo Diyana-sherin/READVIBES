@@ -15,7 +15,7 @@ const {userAuth,adminAuth} = require('../middlewares/auth')
 // Set up multer for file uploads
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, '../images'); // Ensure this directory exists
+        cb(null, '../images'); 
     },
     filename: (req, file, cb) => {
         cb(null, Date.now() + '-' + file.originalname);
@@ -23,22 +23,24 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage: storage });
 
+
+
+
+
+
 //login
 router.get('/login',adminController.loadLogin)
 router.post('/login',adminController.loginAdmin)
-router.get('/dashboard',adminAuth,adminController.loaddash)
 router.get('/logout',adminController.logout)
-
-//router.get('/api/sales-data',adminController.takeData)
+router.get('/dashboard',adminAuth,adminController.loaddash)
 router.post('/generate-sales-report', adminController.generateSalesReport);
 router.post('/filter',adminController.salesChart)
 router.get('/top-products',adminController.topTenProducts)
 router.get('/top-categories',adminController.topTenCategories)
 
+
 //users
 router.get('/users',adminAuth,customerController.userInfo);
-//router.post('/userblock/:id',customerController.userBlocked)
-//router.post('/userunblock/:id',customerController.userUnBlocked)
 router.post('/user/updateStatus/:id',adminAuth, customerController.updateUserStatus);
 
 //category 
@@ -55,13 +57,9 @@ router.delete('/deleteCat/:id', categoryController.deleteCategory);
 router.get('/addBooks',adminAuth,productController.getAddBooksPage)
 router.post('/addBooks',upload.array("images",3),productController.addBooks)
 router.get('/books',adminAuth,productController.getAllBooks)
-
-router.get('/editBook/:id', adminAuth,productController.getEditBookPage); // Route to render edit form
-router.post('/editBook/:id', upload.array('images', 3), productController.editBook); // Route to handle form submission with image upload
-
+router.get('/editBook/:id', adminAuth,productController.getEditBookPage); 
+router.post('/editBook/:id', upload.array('images', 3), productController.editBook); 
 router.post('/book/updateStockStatus/:id',adminAuth,productController.updateStatus)
-
-//router.put('/book/updateStatus/:id', productController.updateBookStatus);
 router.post('/book/updateStatus/:id',adminAuth, productController.updateBookStatus);
 router.delete('/deleteBook/:id', productController.deleteBook);
 

@@ -44,28 +44,7 @@ const loadOrderPage = async (req, res) => {
             ]
         });
 
-        /* const formatOrder = (order) => ({
-             id: order._id,
-             bookName: order.orderedItems.map(item => item.bookName).join(','),
-             category: order.orderedItems.map(item => item.book?.category?.name).join(','),
-             price: order.orderedItems.map(item => item.price).join(', '),
-             quantity: order.orderedItems.map(item => item.quantity ?? 1).join(', '),
-             totalPrice: order.totalPrice,
-             finalAmount: order.finalAmount,
-             offerDiscount: order.orderedItems.map(item => item.perOfferDiscount ?? 1).join(', '),
-             couponDiscount: order.couponDiscount.toFixed(2),
-             orderedAt: order.createdAt ? order.createdAt.toISOString().split("T")[0] : null,
-             status: order.status,
-             paymentMethod : order.paymentMethod,
-             reason : order.reason,
-             expectedDeliveryDate : order.expectedDeliveryDate ? order.expectedDeliveryDate.toISOString().split("T")[0] : null,
-             userAddress: `${order.orderAddress[0].name},${order.orderAddress[0].houseName},${order.orderAddress[0].city},
-             ${order.orderAddress[0].landMark},${order.orderAddress[0].state},${order.orderAddress[0].pincode},
-             ${order.orderAddress[0].phone},${order.orderAddress[0].altPhone}`,
-         });
- 
-         const orders = orderData.map(formatOrder)
-     */
+       
 
         const formatOrder = (order) => ({
             id: order._id,
@@ -155,14 +134,7 @@ const chengeStatus = async (req, res) => {
         console.log(order)
 
         console.log(item.book)
-/*const ID = item.bookName;
-console.log(ID)
-        const book = await Books.findOne({_id:item.book})
-        console.log(book)
-        const Exitingquantity = book.quantity;
-        console.log(Exitingquantity)
-            
-*/
+
 
 
         if (status === 'Cancelled' || status === 'Returned') {
@@ -262,8 +234,6 @@ const ViewOrderDetails = async (req, res) => {
         const formattedOrder = formatOrder(orderData);
 
         // console.log(formattedOrder)
-
-
         // console.log("Order Data:", orderData.userId);
 
         res.render('admin/viewDetails', { order: formattedOrder });
@@ -277,4 +247,8 @@ const ViewOrderDetails = async (req, res) => {
 
 
 
-module.exports = { loadOrderPage, chengeStatus, ViewOrderDetails }
+module.exports = { 
+    loadOrderPage, 
+    chengeStatus, 
+    ViewOrderDetails 
+}

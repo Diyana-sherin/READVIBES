@@ -151,7 +151,7 @@ const updateStatus = async(req,res)=>{
     const offerId = req.params.id;
     const {status} = req.body;
     try {
-        console.log(offerId)
+       
         const offer = await Offer.findOne({_id:offerId})
 
         offer.status = status;

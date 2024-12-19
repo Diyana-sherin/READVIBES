@@ -150,4 +150,11 @@ const deleteCoupon = async (req,res)=>{
 }
 
 
-module.exports = { couponInfo, loadAddCoupons,addCoupons ,loadEditCoupon,editCoupon,deleteCoupon}
+module.exports = { 
+    couponInfo, 
+    loadAddCoupons,
+    addCoupons,
+    loadEditCoupon,
+    editCoupon,
+    deleteCoupon
+}

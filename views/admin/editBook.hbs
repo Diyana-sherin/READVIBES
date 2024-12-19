@@ -352,7 +352,7 @@
             if (!category) {
                 document.getElementById("category-error").innerText = "Valid quantity is required.";
 
-                isValid = false;
+                return false;
             }
 
             return valid; // Return true if all fields are valid

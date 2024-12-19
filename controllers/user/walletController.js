@@ -1,7 +1,4 @@
-const Wallet = require('../../models/walletSchema')
-
-
-
+const Wallet = require('../../models/walletSchema');
 const Razorpay = require('razorpay');
 const crypto = require('crypto');
 
@@ -109,68 +106,7 @@ const walletTopup = async (req, res) => {
     }
 }
 
-/*const verifyPayment = async (req, res) => {
-    try {
-        const { razorpay_payment_id, razorpay_order_id, razorpay_signature, amount } = req.body;
 
-        const userId = req.session.user;
-
-
-        console.log("Body : ", req.body)
-
-        const generatedSignature = crypto
-            .createHmac('sha256', 'jCW28TZMPhifXUXSBo4CVB8I')
-            .update(razorpay_order_id + "|" + razorpay_payment_id)
-            .digest('hex');
-
-
-        if (generatedSignature !== razorpay_signature) {
-            console.error("Signature mismatch:", { generatedSignature, razorpay_signature });
-            return res.status(400).json({ success: false, message: "Invalid payment signature" });
-        }
-
-        if (generatedSignature === razorpay_signature) {
-            let wallet = await Wallet.findOne({ userId: userId });
-
-            // If wallet doesn't exist, create one
-            if (!wallet) {
-                wallet = new Wallet({
-                    userId: userId,
-                    balance: 0,
-                    transactions: [],
-                });
-                await wallet.save();
-                await User.findByIdAndUpdate(userId, { $push: { wallet: wallet._id } });
-                console.log('Created and added wallet reference to user');
-            }
-
-            const numericAmount = amount / 100;
-            wallet.balance += numericAmount;
-
-            // Add a transaction entry in the wallet
-            wallet.transactions.push({
-                date: new Date(),
-                type: 'credit',
-                amount: numericAmount,
-                description: `Top up`,
-                razorpay_payment_id,
-            });
-
-            // Save the updated wallet
-            await wallet.save();
-
-
-            return res.json({ success: true, message: "Payment verified and wallet updated" });
-        } else {
-            return res.status(400).json({ success: false, message: "Invalid payment signature" });
-        }
-    }
-    catch (error) {
-        console.error("Error during payment verification:", error);
-        return res.status(500).json({ success: false, message: "Internal Server Error" });
-    }
-
-}*/
 
 const verifyPayment = async (req, res) => {
     try {

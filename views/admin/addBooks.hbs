@@ -174,7 +174,7 @@
                             <!-- Image Input 1 -->
                             <div class="col-md-4">
                                 <input class="form-control" type="file" id="input1" accept="image/*" name="images"
-                                    onchange="handleFileSelect(event, 1)">
+                                    onchange="handleFileSelect(event, 1)" required>
                                 <div id="images-error" class="error-message"></div>
                                 <img src="" alt="" id="imgView1" class="img-thumbnail mt-2">
                                 <div class="image-cropper" id="cropperContainer1">
@@ -187,7 +187,7 @@
                             <!-- Image Input 2 -->
                             <div class="col-md-4">
                                 <input class="form-control" type="file" id="input2" accept="image/*" name="images"
-                                    onchange="handleFileSelect(event, 2)">
+                                    onchange="handleFileSelect(event, 2)" required>
                                 <img src="" alt="" id="imgView2" class="img-thumbnail mt-2">
                                 <div class="image-cropper" id="cropperContainer2">
                                     <img src="" id="croppedImg2" alt="">
@@ -199,7 +199,7 @@
                             <!-- Image Input 3 -->
                             <div class="col-md-4">
                                 <input class="form-control" type="file" id="input3" accept="image/*" name="images"
-                                    onchange="handleFileSelect(event, 3)">
+                                    onchange="handleFileSelect(event, 3)" required>
                                 <img src="" alt="" id="imgView3" class="img-thumbnail mt-2">
                                 <div class="image-cropper" id="cropperContainer3">
                                     <img src="" id="croppedImg3" alt="">

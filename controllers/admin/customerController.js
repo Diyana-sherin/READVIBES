@@ -63,29 +63,9 @@ const userInfo = async (req, res) => {
 };
 
 
-//block
-const userBlocked = async (req,res)=>{
-  try {
-    let id = req.params.id;
-    await User.updateOne({_id:id},{$set:{isBlocked:false}});
-    res.redirect('/admin/users')
-  } catch (error) {
-    console.error("Error blocking user:", error);
-    res.status(500).send("Server Error");
-  }
-}
 
-//unblocked
-const userUnBlocked = async (req,res)=>{
-  try {
-    let id = req.params.id;
-    await User.updateOne({_id:id},{$set:{isBlocked:true}});
-    res.redirect('/admin/users')
-  } catch (error) {
-    console.error("Error unblocking user:", error);
-    res.status(500).send("Server Error");
-  }
-}
+
+
 
 
 //user Status
@@ -109,7 +89,5 @@ const updateUserStatus = async (req, res) => {
 
 module.exports = {
   userInfo,
-  userBlocked,
-  userUnBlocked,
   updateUserStatus,
 };

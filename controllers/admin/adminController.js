@@ -17,11 +17,12 @@ const loadLogin = async (req, res) => {
 }
 //login
 
+
 const loginAdmin = async (req, res) => {
     try {
         const { email, password } = req.body;
         const admin = await Admin.findOne({ email })
-        console.log(admin)
+        //console.log(admin)
         if (!admin) {
             return res.render("admin/login", { message: "Admin not found" });
         }
@@ -31,7 +32,7 @@ const loginAdmin = async (req, res) => {
             return res.render("admin/login", { message: "Password is incorrect" })
         } else {
             req.session.admin = admin._id;
-            console.log(req.session.admin)
+            //console.log(req.session.admin)
             res.redirect('/admin/dashboard')
         }
     }
@@ -81,7 +82,7 @@ const topTenProducts = async (req, res) => {
             { $sort: { totalSold: -1 } },
             { $limit: 10 }
         ])
-        console.log(topProducts)
+        //console.log(topProducts)
 
         res.json(topProducts);
     } catch (error) {
@@ -90,29 +91,7 @@ const topTenProducts = async (req, res) => {
 }
 
 
-//
-const topCategories = async (req, res) => {
-    try {
-        const topCategories = await Order.aggregate([
-            { $unwind: "$orderedItems" },
-            {
-                $lookup: {
-                    from: "books",
-                    localField: "orderedItems.book",
-                    foreignField: "_id",
-                    as: "bookDetails"
-                }
-            },
-            { $unwind: "$bookDetails" },
-            { $group: { _id: "$bookDetails.category", totalSold: { $sum: "$orderedItems.quantity" } } },
-            { $sort: { totalSold: -1 } },
-            { $limit: 10 }
-        ]);
-        res.json(topCategories);
-    } catch (error) {
-        res.status(500).json({ message: "Error fetching data", error });
-    }
-}
+
 
 
 //Top 10 category
@@ -148,7 +127,7 @@ const topTenCategories = async (req, res) => {
             { $limit: 10 }
         ]);
 
-        console.log(topCategories);
+        //console.log(topCategories);
         res.json(topCategories);
     } catch (error) {
         res.status(500).json({ message: "Error fetching data", error });
@@ -164,7 +143,7 @@ const generateSalesReport = async (req, res) => {
     try {
         const { reportType, customStartDate, customEndDate } = req.body;
         let startDate, endDate;
-        console.log(req.body);
+        //console.log(req.body);
 
 
 
@@ -326,7 +305,7 @@ async function calculateRevenue(filter) {
         label: item._id.toString(),
         value: item.totalRevenue,
     }));
-    console.log(revenueData)
+    //console.log(revenueData)
 
     return revenueData.map((item) => ({
         label: item._id.toString(),
@@ -356,11 +335,7 @@ function getDateRange(filter) {
 }
 
 function getGroupingKey(filter) {
-    return filter === "weekly"
-        ? { $isoWeek: "$createdAt" }
-        : filter === "monthly"
-            ? { $month: "$createdAt" }
-            : { $year: "$createdAt" };
+    return filter === "weekly" ? { $isoWeek: "$createdAt" } : filter === "monthly" ? { $month: "$createdAt" }  : { $year: "$createdAt" };
 }
 
 
@@ -384,4 +359,13 @@ const logout = async (req, res) => {
 
 
 
-module.exports = { loadLogin, loaddash, loginAdmin, logout, generateSalesReport, salesChart, topTenProducts, topTenCategories, topCategories }
+module.exports = { 
+    loadLogin, 
+    loaddash, 
+    loginAdmin, 
+    logout, 
+    generateSalesReport, 
+    salesChart, 
+    topTenProducts, 
+    topTenCategories,
+    };

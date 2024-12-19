@@ -1,4 +1,6 @@
+const Books = require('../../models/bookSchema')
 const Category = require('../../models/categorySchema');
+
 
 // Controller to get paginated category information
 const categoryInfo = async (req, res) => {
@@ -139,6 +141,8 @@ const updateCategoryStatus = async (req, res) => {
         const catId = req.params.id;
         const deletedCat = await Category.findByIdAndDelete(catId);
 
+       
+
         if (deletedCat) {
             res.status(200).json({ success: true, message: "Category deleted successfully." });
         } else {
@@ -154,4 +158,12 @@ const updateCategoryStatus = async (req, res) => {
 
 
 
-module.exports = { categoryInfo, addCategory ,loadAddCategory,getEditCategory, updateCategory,updateCategoryStatus ,deleteCategory};
+module.exports = { 
+    categoryInfo, 
+    addCategory,
+    loadAddCategory,
+    getEditCategory, 
+    updateCategory,
+    updateCategoryStatus,
+    deleteCategory
+};

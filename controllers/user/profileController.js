@@ -353,41 +353,6 @@ const filterOrders = async (req, res) => {
 };
 
 
-/*const getOrderCancelPage = async (req,res)=>{
-    const orderId = req.params.id;
-    console.log(orderId)
-    try {
-        const order = await Order.findOne({_id :orderId}).populate('orderedItems.book');
-        console.log(order)
-        if(!order)
-        {
-            return res.status(404).json({ message: 'order not found.' });
-        }
-        const orderItems = order.orderedItems.map((item) => ({
-            bookName: item.bookName,
-            quantity: item.quantity,
-            price: item.price,
-            offerDiscount: item.offerDiscount,
-        }));
-
-        const orderDetails = {
-            id: order._id,
-            paymentMethod: order.paymentMethod,
-            totalPrice: order.totalPrice,
-            finalAmount: order.finalAmount,
-            orderItems,
-            status: order.status,
-        };
-
-        console.log(orderDetails)
-        res.render('users/cancel-order',
-            {orderDetails}
-        )
-    } catch (error) {
-        console.error("Error canceling order:", error);
-      return res.json({ success: false, message: "Internal server error" });
-    }
-}*/
 const getOrderCancelPage = async (req, res) => {
     const itemId = req.params.id;  
     console.log(itemId);
@@ -474,52 +439,7 @@ const getOrderCancelPage = async (req, res) => {
 
 
 
-/*const cancelOrder = async(req,res)=>{
-    const { orderId,reason } = req.body;
-    console.log(req.body)
 
-    try {
-      // Update order status in the database
-      //const order = await Order.findByIdAndUpdate(orderId, { status: 'Cancelled' });
-  
-      const order = await Order.find(
-        { 
-          canceledItems: { 
-            $elemMatch: { _id: orderId } 
-          } 
-        },
-        {
-          "canceledItems.$": 1 // Project only the matching item in orderedItems
-        }
-      );
-
-      console.log(order)
-      
-
-      //const order = await Order.findOne({ _id: orderId });
-      if (!order) {
-        return res.json({ success: false, message: "Order not found" });
-      }
-
-
-      if (order.status === 'Cancelled') {
-        return res.json({ success: false, message: "Order has already been canceled" });
-      }
-
-
-      order.reason = reason;
-      order.status = 'Cancel Request';
-
-      // Save the updated order
-      await order.save();
-
-      return res.json({ success: true });
-    } catch (error) {
-      console.error("Error canceling order:", error);
-      return res.json({ success: false, message: "Internal server error" });
-    }
-  
-}*/
 
 const getOrderReturnPage = async (req,res)=>{
     const itemId = req.params.id;
